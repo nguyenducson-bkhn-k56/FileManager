@@ -217,7 +217,7 @@ public class FileDao {
             }
 
             // tao folder moi
-            String pathNewFile = JsonBase.pathFolderRoot + destinyFolderContent.getPath().replace("root/", "") + "/" + name;
+            String pathNewFile = JsonBase.pathFolderRoot + destinyFolderContent.getPath().replace("root/", "") + "/" + name+fileType;
             File newFile = new File(pathNewFile);
             if (!newFile.exists()) {
                 return false;
@@ -335,12 +335,12 @@ public class FileDao {
                 return false;
             }
 
-            // tim file can edit
+            // tim folder can edit
             
-             // tim file can edit
+             // tim folder can edit
             FolderContent folderNeedRemove = null;
             for (FolderContent folder : listFolderContentTemp) {
-                if (folder.getName().equals(name)) {
+                if (folder.getName()!=null && folder.getName().equals(name)) {
                     folderNeedRemove = folder;
                     break;
                 }
@@ -350,7 +350,7 @@ public class FileDao {
             }
             
             
-            File folder = new File(JsonBase.pathRoot+"/" + folderNeedRemove.getParentPath().replace("root/", "") +"/"+folderNeedRemove.getName());
+            File folder = new File(JsonBase.pathFolderRoot+"/" + folderNeedRemove.getParentPath().replace("root/", "") +"/"+folderNeedRemove.getName());
             if(folder.exists()){
                 if(!folder.delete())
                     return false;

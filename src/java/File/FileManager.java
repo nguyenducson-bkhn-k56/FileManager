@@ -6,16 +6,20 @@
 package File;
 
 import Dao.FileDao;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataMultiPart;
+import Entity.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.ContentDisposition;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,6 +29,9 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -39,15 +46,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import json.JsonBase;
 import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.apache.http.entity.mime.MultipartEntity;
 
 /**
  * REST Web Service
@@ -59,41 +65,52 @@ public class FileManager {
 
     public static String root = "fileManager";
 
-//    //xoa folder 
-//    @DELETE
-//    @Path("/deleteFolder")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    public String delFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
-//        FileManagerController controller = new FileManagerController();
-//        return controller.removeFolder(parentPath, name);
-//    }
-//
-    // ham sua doi ten folder
-//    @POST
-//    @Path("/editFolderName")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    public String editFolderName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
-//        
-//        return controller.editFolderName(parentPath, oldName, newName);
-//
-//    }
-//
-//    // ham xoa folder
-//    @POST
-//    @Path("/removeFolder")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    public String removeFolder(@FormParam("data") String data, @Context HttpServletResponse servletResponse) {
-//        FileManagerController controller = new FileManagerController();
-//        return null;
-//    }
-//
-//    // ham tao folder
     @POST
     @Path("/addFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public String addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name){
         FileDao dao = new FileDao();
         if (dao.addNewFolder(parentPath, name)) {
+            return "200";
+        }
+        return "404";
+    }
+    
+    
+    //xoa folder 
+    @DELETE
+    @Path("/deleteFolder")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String delFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+        FileDao dao = new FileDao();
+        if (dao.delFolder(parentPath, name)) {
+            return "200";
+        }
+        return "404";
+    }
+//
+    // ham sua doi ten folder
+
+    @POST
+    @Path("/editFolderName")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String editFolderName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
+
+        FileDao dao = new FileDao();
+        if (dao.editFolder(parentPath, name, newName)) {
+            return "200";
+        }
+        return "404";
+
+    }
+
+//    // ham tao folder
+    @POST
+    @Path("/delFile")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String removeFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+        FileDao dao = new FileDao();
+        if (dao.delFile(parentPath, name)) {
             return "200";
         }
         return "404";
@@ -109,14 +126,18 @@ public class FileManager {
     }
 //
 //    // thay doi ten file
-//    @POST
-//    @Path("/editFileName")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    public String editFileName(@FormParam("data") String data) {
-//        FileManagerController controller = new FileManagerController();
-//        return controller.editFileName(data);
-//
-//    }
+
+    @POST
+    @Path("/editFileName")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String editFileName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
+        FileDao dao = new FileDao();
+        if (dao.editFileName(parentPath, name, newName)) {
+            return "200";
+        }
+        return "404";
+
+    }
 
     // ham download file 
     @POST
@@ -132,99 +153,128 @@ public class FileManager {
 
     }
 
-    @POST
-    @Path("/uploadFile")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(
-            @FormDataParam("file") InputStream uploadedInputStream,
-            @FormParam("parentPath") String parentPath ,
-            @FormParam("name") String name,
-            @FormParam("fileType") String fileType) {
-
-        String uploadedFileLocation = JsonBase.pathRoot +"/" + parentPath.replace("root/", "") + "/" + name +".docx";
-        FileDao fileDao = new FileDao();
-        // save it
-        writeToFile(uploadedInputStream, uploadedFileLocation);
-        String output = "File uploaded to : " + uploadedFileLocation;
-        
-        Response result = Response.status(200).entity(output).build();
-        fileDao.addNewFile(parentPath,name,fileType);
-        return result;
-    }
-
+    
+//    @POST
+//    @Path("/uploadFile")
+//    @Consumes(MediaType.MULTIPART_FORM_DATA)
+//    public Response uploadFile(
+//            @FormDataParam("file") InputStream uploadedInputStream,
+//            @FormParam("parentPath") String parentPath ,
+//            @FormParam("name") String name,
+//            @FormParam("fileType") String fileType) {
+//
+//        String uploadedFileLocation = JsonBase.pathRoot +"/" + parentPath.replace("root/", "") + "/" + name;
+//        FileDao fileDao = new FileDao();
+//        // save it
+//        writeToFile(uploadedInputStream, uploadedFileLocation);
+//        String output = "File uploaded to : " + uploadedFileLocation;
+//        
+//        Response result = Response.status(200).entity(output).build();
+//        fileDao.addNewFile(parentPath,name,fileType);
+//        return result;
+//    }
+//    @POST
+//    @Path("/upload")
+//    @Consumes(MediaType.MULTIPART_FORM_DATA)
+//    public Response uploadFile2(
+//              @FormDataParam("file") InputStream fileInputStream,
+//              @FormDataParam("file") FormDataContentDisposition fileMetaData) {
+//
+//        String uploadedFileLocation = "D://"  + "filetype.doc";
+//        FileDao fileDao = new FileDao();
+//        // save it
+////        writeToFile(uploadedInputStream, uploadedFileLocation);
+//        String output = "File uploaded to : " + uploadedFileLocation;
+//        
+//        Response result = Response.status(200).entity(output).build();
+//        //fileDao.addNewFile(parentPath,name,fileType);
+//        return result;
+//    }
     // save uploaded file to new location
     private void writeToFile(InputStream uploadedInputStream,
-            String uploadedFileLocation) {
-
+            String uploadedFileLocation) throws IOException {
+        FileOutputStream out = null;
         try {
-            OutputStream out = new FileOutputStream(new File(
+            out = new FileOutputStream(new File(
                     uploadedFileLocation));
             int read = 0;
             byte[] bytes = new byte[1024];
-
-            out = new FileOutputStream(new File(uploadedFileLocation));
-            while ((read = uploadedInputStream.read(bytes)) != -1) {
+            File file = new File(uploadedFileLocation);
+            out = new FileOutputStream(file);
+            int length;
+            while ((read = uploadedInputStream.read(bytes)) >0) {
                 out.write(bytes, 0, read);
             }
-            out.flush();
-            out.close();
-        } catch (IOException e) {
 
-            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
         }
 
     }
 
-//    @POST
-//    @Path("/uploadFile")
-//    @Consumes("multipart/form-data")
-//    public Response uploadFile(MultipartFormDataInput input) throws IOException {
-//        //Get API input data
-//        Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
-//
-//        //Get file name
-//        String fileName = uploadForm.get("fileName").get(0).getBodyAsString();
-//
-//        //Get parentPath
-//        String parentPath = uploadForm.get("parentPath").get(1).getBodyAsString();
-//
-//        //Get file data to save
-//        List<InputPart> inputParts = uploadForm.get("attachment");
-//
-//        for (InputPart inputPart : inputParts) {
-//            try {
-//                //Use this header for extra processing if required
-//                @SuppressWarnings("unused")
-//                MultivaluedMap<String, String> header = inputPart.getHeaders();
-//
-//                // convert the uploaded file to inputstream
-//                InputStream inputStream = inputPart.getBody(InputStream.class, null);
-//
-//                byte[] bytes = IOUtils.toByteArray(inputStream);
-//                // constructs upload file path
-//                fileName = JsonBase.pathRoot + "/" + parentPath.replace("root/", "") + "/" + fileName;
-//                writeFile(bytes, fileName);
-//                System.out.println("Success !!!!!");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return Response.status(200)
-//                .entity("Uploaded file name : " + fileName).build();
-//
-//    }
-//
-//    //Utility method
-//    private void writeFile(byte[] content, String filename) throws IOException {
-//        File file = new File(filename);
-//        if (!file.exists()) {
-//            file.createNewFile();
-//        }
-//        FileOutputStream fop = new FileOutputStream(file);
-//        fop.write(content);
-//        fop.flush();
-//        fop.close();
-//    }
+    @POST
+    @Path("/upload")
+    @Consumes("binary/octet-stream")
+    public Response upload(@FormDataParam("file") InputStream fileInputStream
+    ) {
+        String uploadedFileLocation = "E://" + "temp2.docx";
+//        FileDao fileDao = new FileDao();
+//        // save it
 
-    
+        String output = "File uploaded to : " + uploadedFileLocation;
+        System.out.println(output);
+        try{
+        writeToFile(fileInputStream, uploadedFileLocation);
+        }catch(IOException ex){
+            return Response.status(1).entity(output).build();
+        }
+        Response result = Response.status(200).entity(output).build();
+//        fileDao.addNewFile(parentPath,name,fileType);
+        return result;
+    }
+
+    @POST
+    @Path("/moveFileToDes")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String moveFileToDes(@FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName) {
+        FileDao fileDao = new FileDao();
+        File fileTemp = new File("E://" + "temp2.docx");
+        String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName + ".docx";
+        File newFile = new File(newFilePath);
+        try {
+            InputStream inStream = null;
+            OutputStream outStream = null;
+            inStream = new FileInputStream(fileTemp);
+            outStream = new FileOutputStream(newFile);
+
+            byte[] buffer = new byte[1024];
+
+            int length;
+            //copy the file content in bytes
+            while ((length = inStream.read(buffer)) > 0) {
+
+                outStream.write(buffer, 0, length);
+
+            }
+            inStream.close();
+            outStream.close();
+
+            //delete the original file
+            fileTemp.delete();
+            newFile.setExecutable(true);
+            newFile.setReadable(true);
+            newFile.setWritable(true);
+
+            System.out.println("File is copied successful!");
+
+            fileDao.addNewFile(parentPath, fileName, ".docx");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return "200";
+    }
+
 }

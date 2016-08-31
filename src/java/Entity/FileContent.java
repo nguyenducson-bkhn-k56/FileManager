@@ -23,7 +23,7 @@ public class FileContent {
     
     private String parentPath;
     
-    private String fileType;
+    private String fileType=".docx";
 
     public String getFileType() {
         return fileType;
