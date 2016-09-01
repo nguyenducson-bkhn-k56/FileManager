@@ -172,14 +172,15 @@ public class JsonBase {
         }
     }
     
-    public static FolderContent readFileJson(File file, Class a){
+    public static Object readFileJson(File file, Class<?> classObject){
         try {
+            Object result = null;
             FileReader fileReader = new FileReader(file.getAbsolutePath());
             StringBuilder data = new StringBuilder();
             Gson gson = new Gson();
             JsonReader jsonReader = new JsonReader(fileReader);
-            FolderContent folderContent = (FolderContent) gson.fromJson(jsonReader, FolderContent.class);
-            return folderContent;
+            result = (Object) gson.fromJson(jsonReader, classObject);
+            return result;
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;

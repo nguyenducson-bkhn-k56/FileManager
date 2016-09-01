@@ -26,11 +26,5 @@ public class FavouriteAction {
 
     public static String root = "FavouriteAction";
     
-    @POST
-    @Path("/login")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void logIn(String userCode,String passWord)
-    {
-        
-    }
+ 
 }

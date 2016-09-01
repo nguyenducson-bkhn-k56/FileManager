@@ -28,11 +28,11 @@ public class FavouriteDao {
     
     // ham tao mot folder favorite
     public Integer createFolderFavorite(String parentPath,String nameFile){
-        try{
+        try{           
             String hwarePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH  +  parentPath.replace(Constant.Constant.NAME_ROOT_FOLDER, "") +"/" + nameFile;
             File folderNew= new File(hwarePath);
             if(folderNew.exists()){
-                return Constant.Constant.EROR_FOLDER_FILE_EXIST;
+                return Constant.Constant.NORMAL;
             }
             if(!folderNew.mkdir())
                 return Constant.Constant.EROR;

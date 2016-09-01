@@ -30,7 +30,7 @@ public class UserAction {
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer logIn(@FormParam("userCode") String userCode, @FormParam("passWord") String passWord){
+    public String logIn(@FormParam("userCode") String userCode, @FormParam("passWord") String passWord){
         UserController userController = new UserController();
         return userController.logIn(userCode, passWord);
     }
