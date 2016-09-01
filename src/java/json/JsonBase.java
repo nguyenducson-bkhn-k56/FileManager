@@ -171,4 +171,18 @@ public class JsonBase {
             return null;
         }
     }
+    
+    public static FolderContent readFileJson(File file, Class a){
+        try {
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+            StringBuilder data = new StringBuilder();
+            Gson gson = new Gson();
+            JsonReader jsonReader = new JsonReader(fileReader);
+            FolderContent folderContent = (FolderContent) gson.fromJson(jsonReader, FolderContent.class);
+            return folderContent;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 }
