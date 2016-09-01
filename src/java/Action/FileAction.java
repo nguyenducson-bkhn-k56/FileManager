@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package File;
+package Action;
 
 import Dao.FileDao;
 import Entity.FormDataContentDisposition;
@@ -61,19 +61,19 @@ import org.apache.http.entity.mime.MultipartEntity;
  * @author nguyen
  */
 @Path("/fileManager")
-public class FileManager {
+public class FileAction {
 
-    public static String root = "fileManager";
+   public static String root = "fileManager";
 
     @POST
     @Path("/addFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name){
+    public Integer addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name){
         FileDao dao = new FileDao();
         if (dao.addNewFolder(parentPath, name)) {
-            return "200";
+            return Constant.Constant.NORMAL;
         }
-        return "404";
+       return Constant.Constant.EROR;
     }
     
     
@@ -81,12 +81,12 @@ public class FileManager {
     @DELETE
     @Path("/deleteFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String delFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public Integer delFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
         FileDao dao = new FileDao();
         if (dao.delFolder(parentPath, name)) {
-            return "200";
+            return Constant.Constant.NORMAL;
         }
-        return "404";
+        return Constant.Constant.EROR;
     }
 //
     // ham sua doi ten folder
@@ -94,13 +94,13 @@ public class FileManager {
     @POST
     @Path("/editFolderName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String editFolderName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
+    public Integer editFolderName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
 
         FileDao dao = new FileDao();
         if (dao.editFolder(parentPath, name, newName)) {
-            return "200";
+            return Constant.Constant.NORMAL;
         }
-        return "404";
+        return Constant.Constant.EROR;
 
     }
 
@@ -108,12 +108,12 @@ public class FileManager {
     @POST
     @Path("/delFile")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String removeFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public Integer removeFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
         FileDao dao = new FileDao();
         if (dao.delFile(parentPath, name)) {
-            return "200";
+            return Constant.Constant.NORMAL;
         }
-        return "404";
+        return Constant.Constant.EROR;
     }
 //
     // lay danh sach tat cac cac file
@@ -130,12 +130,12 @@ public class FileManager {
     @POST
     @Path("/editFileName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String editFileName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
+    public Integer editFileName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
         FileDao dao = new FileDao();
         if (dao.editFileName(parentPath, name, newName)) {
-            return "200";
+            return Constant.Constant.NORMAL;
         }
-        return "404";
+        return Constant.Constant.EROR;
 
     }
 
@@ -154,43 +154,6 @@ public class FileManager {
     }
 
     
-//    @POST
-//    @Path("/uploadFile")
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-//    public Response uploadFile(
-//            @FormDataParam("file") InputStream uploadedInputStream,
-//            @FormParam("parentPath") String parentPath ,
-//            @FormParam("name") String name,
-//            @FormParam("fileType") String fileType) {
-//
-//        String uploadedFileLocation = JsonBase.pathRoot +"/" + parentPath.replace("root/", "") + "/" + name;
-//        FileDao fileDao = new FileDao();
-//        // save it
-//        writeToFile(uploadedInputStream, uploadedFileLocation);
-//        String output = "File uploaded to : " + uploadedFileLocation;
-//        
-//        Response result = Response.status(200).entity(output).build();
-//        fileDao.addNewFile(parentPath,name,fileType);
-//        return result;
-//    }
-//    @POST
-//    @Path("/upload")
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-//    public Response uploadFile2(
-//              @FormDataParam("file") InputStream fileInputStream,
-//              @FormDataParam("file") FormDataContentDisposition fileMetaData) {
-//
-//        String uploadedFileLocation = "D://"  + "filetype.doc";
-//        FileDao fileDao = new FileDao();
-//        // save it
-////        writeToFile(uploadedInputStream, uploadedFileLocation);
-//        String output = "File uploaded to : " + uploadedFileLocation;
-//        
-//        Response result = Response.status(200).entity(output).build();
-//        //fileDao.addNewFile(parentPath,name,fileType);
-//        return result;
-//    }
-    // save uploaded file to new location
     private void writeToFile(InputStream uploadedInputStream,
             String uploadedFileLocation) throws IOException {
         FileOutputStream out = null;
@@ -239,7 +202,7 @@ public class FileManager {
     @POST
     @Path("/moveFileToDes")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String moveFileToDes(@FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName) {
+    public Integer moveFileToDes(@FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName) {
         FileDao fileDao = new FileDao();
         File fileTemp = new File("E://" + "temp2.docx");
         String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName + ".docx";
@@ -270,11 +233,15 @@ public class FileManager {
 
             System.out.println("File is copied successful!");
 
-            fileDao.addNewFile(parentPath, fileName, ".docx");
+            if(fileDao.addNewFile(parentPath, fileName, ".docx"))
+                return Constant.Constant.NORMAL;
+            else
+                return Constant.Constant.EROR;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return "200";
+        return Constant.Constant.EROR;
     }
+    
 
 }

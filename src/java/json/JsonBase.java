@@ -142,4 +142,33 @@ public class JsonBase {
 //        
 //    }
 
+    
+    // ham ghi file json vi tri m
+    public static boolean writeFileJson(String json,File fileToWrite){
+       try{
+            FileWriter fileWrite = new FileWriter(fileToWrite);
+            fileWrite.write(json);
+            fileWrite.flush();
+            fileWrite.close();
+            return true;
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    // ham doc json cua file 
+    public static FolderContent readFileJson(File file){
+        try {
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+            StringBuilder data = new StringBuilder();
+            Gson gson = new Gson();
+            JsonReader jsonReader = new JsonReader(fileReader);
+            FolderContent folderContent = (FolderContent) gson.fromJson(jsonReader, FolderContent.class);
+            return folderContent;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
 }

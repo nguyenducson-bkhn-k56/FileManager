@@ -276,6 +276,7 @@ public class FileDao {
 
             // tim file can edit
             FileContent fileNeedRemove = null;
+            int posFileNeedRemove=0;
             ArrayList<FileContent> listFileTemp = destinyFolderContent.getListFiles();
             if (listFileTemp == null) {
                 return false;
@@ -285,6 +286,7 @@ public class FileDao {
                     fileNeedRemove = fileTemp;
                     break;
                 }
+                posFileNeedRemove++;
             }
             if (fileNeedRemove == null) {
                 return false;
@@ -297,7 +299,7 @@ public class FileDao {
             }else{
                 return false;
             }
-            destinyFolderContent.getListFiles().remove(fileNeedRemove);
+            destinyFolderContent.getListFiles().remove(posFileNeedRemove);
             JsonBase.writeFileJson(JsonBase.generateJSONBase(rootFolder));
             return true;
         } catch (Exception ex) {
@@ -306,7 +308,7 @@ public class FileDao {
     }
     
     public boolean delFolder(String parentPath, String name) {
-          try {
+           try {
 
             String arrayFile[] = parentPath.replace("/", "-").split("-");
             FolderContent tempFolderContent;
@@ -338,12 +340,15 @@ public class FileDao {
             // tim folder can edit
             
              // tim folder can edit
+            int posOfFolderNeedDelete=0;
             FolderContent folderNeedRemove = null;
             for (FolderContent folder : listFolderContentTemp) {
+                
                 if (folder.getName()!=null && folder.getName().equals(name)) {
                     folderNeedRemove = folder;
                     break;
                 }
+                posOfFolderNeedDelete++;
             }
             if (folderNeedRemove == null) {
                 return false;
@@ -357,7 +362,7 @@ public class FileDao {
             }else{
                 return false;
             }
-            destinyFolderContent.getListFiles().remove(folderNeedRemove);
+            destinyFolderContent.getListFolders().remove(posOfFolderNeedDelete);
             JsonBase.writeFileJson(JsonBase.generateJSONBase(rootFolder));
             return true;
         } catch (Exception ex) {
@@ -383,13 +388,10 @@ public class FileDao {
                 tempFile.setUrl(folder.getPath() + "/" + tempFile.getName());
             }
         }
-
     }
+    
+    
 
-    public static void main(String args[]) {
-        FileDao dao = new FileDao();
-        dao.delFile("root/folder3", "folder4");
-    }
 
    
 }
