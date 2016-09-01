@@ -120,9 +120,9 @@ public class FileAction {
 
     @GET
     @Path("/getListAllFile")
-    public String getListAllFile() {
+    public Response getListAllFile() {
         FileDao fileDao = new FileDao();
-        return fileDao.getListAllFile();
+        return Response.status(Response.Status.OK).entity(fileDao.getListAllFile()).build();
     }
 //
 //    // thay doi ten file
