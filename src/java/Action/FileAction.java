@@ -52,6 +52,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import json.JsonBase;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.mime.MultipartEntity;
 
@@ -206,6 +207,8 @@ public class FileAction {
         FileDao fileDao = new FileDao();
         File fileTemp = new File("E://" + "temp2.docx");
         String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName + ".docx";
+        String fileType = FilenameUtils.getExtension(fileName);
+        fileName = FilenameUtils.getBaseName(fileName);
         File newFile = new File(newFilePath);
         try {
             InputStream inStream = null;
@@ -233,7 +236,7 @@ public class FileAction {
 
             System.out.println("File is copied successful!");
 
-            if(fileDao.addNewFile(parentPath, fileName, ".docx"))
+            if(fileDao.addNewFile(parentPath, fileName, fileType))
                 return Constant.Constant.NORMAL;
             else
                 return Constant.Constant.EROR;

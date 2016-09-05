@@ -27,6 +27,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import json.JsonBase;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * REST Web Service
@@ -46,23 +47,24 @@ public class FavouriteAction {
         try {
             File tempFile = File.createTempFile("tempFile", ".tmp");
             writeToFile(fileInputStream, tempFile.getAbsolutePath());
-            Response result = Response.status(200).entity(tempFile.getAbsolutePath()).build();
+            Response result = Response.status(Constant.Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
 //        fileDao.addNewFile(parentPath,name,fileType);
             return result;
         } catch (IOException ex) {
             ex.printStackTrace();
             return Response.status(Constant.Constant.EROR).entity("loi up file").build();
         }
-
     }
 
     @POST
     @Path("/moveFileFavoriteToFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
+    public Integer moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath,@FormParam("userId") String userId, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
         FileDao fileDao = new FileDao();
         File fileTemp = new File(absolutePath);
-        String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName + fileType;
+        fileType = FilenameUtils.getExtension(fileName);
+        fileName = FilenameUtils.getBaseName(fileName);
+        String newFilePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId +"/"  + fileName + "." + fileType;
         File newFile = new File(newFilePath);
         try {
             InputStream inStream = null;
@@ -90,7 +92,7 @@ public class FavouriteAction {
 
             System.out.println("File is copied successful!");
 
-            if (fileDao.addNewFile(parentPath, fileName, ".docx")) {
+            if (fileDao.addNewFile( fileName, ".docx",new File(Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId +"/" +Constant.Constant.FILE_CONFIG))) {
                 return Constant.Constant.NORMAL;
             } else {
                 return Constant.Constant.EROR;
@@ -136,7 +138,6 @@ public class FavouriteAction {
         Response.ResponseBuilder response = Response.ok((Object) file);
         response.header("Content-Disposition", "attachment; filename=newfile.zip");
         return response.build();
-
     }
 
     /***
@@ -165,4 +166,6 @@ public class FavouriteAction {
             return Response.status(Constant.Constant.EROR).build();
         }
     }
+    
+    
 }

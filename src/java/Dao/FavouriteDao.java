@@ -42,7 +42,7 @@ public class FavouriteDao {
             FolderContent folder = new FolderContent();
             folder.setLevel(1);
             folder.setName(nameFile);
-            folder.setPath(Constant.Constant.NAME_ROOT_FOLDER + nameFile);
+            folder.setPath(Constant.Constant.NAME_ROOT_FOLDER+"/" + nameFile);
             folder.setParentPath(Constant.Constant.NAME_ROOT_FOLDER );
             folder.setListFiles(new ArrayList<FileContent>());
             if(JsonBase.writeFileJson(JsonBase.generateJSONBase(folder),fileConfig))
