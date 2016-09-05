@@ -16,6 +16,7 @@ public class Constant {
     public static int EROR = 423;
     public static int EXCEPTION = 433;
     public static int EROR_FOLDER_FILE_EXIST = 422;
+    public static int EROR_FOLDER_FILE_NOT_EXIST = 446;
     public static int NOT_FOUND_USER = 421;
     public static int WRONG_PASS = 423;
     // value of Folder Favour

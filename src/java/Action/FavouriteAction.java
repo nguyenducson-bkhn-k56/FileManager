@@ -6,6 +6,7 @@
 package Action;
 
 import Dao.FileDao;
+import Entity.FolderContent;
 import com.sun.jersey.multipart.FormDataParam;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,23 +43,23 @@ public class FavouriteAction {
     @Consumes("binary/octet-stream")
     public Response upload(@FormDataParam("file") InputStream fileInputStream
     ) {
-        try{
+        try {
             File tempFile = File.createTempFile("tempFile", ".tmp");
             writeToFile(fileInputStream, tempFile.getAbsolutePath());
             Response result = Response.status(200).entity(tempFile.getAbsolutePath()).build();
 //        fileDao.addNewFile(parentPath,name,fileType);
             return result;
-        }catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
             return Response.status(Constant.Constant.EROR).entity("loi up file").build();
         }
-        
+
     }
 
     @POST
     @Path("/moveFileFavoriteToFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer moveFileToDes(@FormParam("absolutePath") String absolutePath ,@FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
+    public Integer moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
         FileDao fileDao = new FileDao();
         File fileTemp = new File(absolutePath);
         String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName + fileType;
@@ -123,19 +124,45 @@ public class FavouriteAction {
         }
 
     }
-    
-    
-     // ham download file 
+
+    // ham download file 
     @POST
     @Path("/downloadFile")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response downloadFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("idUser") String idUser, @FormParam("fileType") String fileType) {
-        String filePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + parentPath.replace("root",idUser ) + "/" + name + fileType;
+        String filePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + parentPath.replace("root", idUser) + "/" + name + fileType;
         File file = new File(filePath);
         Response.ResponseBuilder response = Response.ok((Object) file);
         response.header("Content-Disposition", "attachment; filename=newfile.zip");
         return response.build();
 
+    }
+
+    /***
+     * 
+     * @param userId
+     * @return 
+     */
+    @POST
+    @Path("/getListFileFavourite")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response getListFileFavourite(@FormParam("userId") String userId) {
+
+        try {
+            String filePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.Constant.FILE_CONFIG;
+            File fileConfig = new File(filePath);
+            if (!fileConfig.exists()) {
+                return Response.status(Constant.Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
+            }
+            FolderContent folderContent = (FolderContent) JsonBase.readFileJson(fileConfig, FolderContent.class);
+            if (folderContent != null) {
+                return Response.status(Constant.Constant.NORMAL).entity(JsonBase.generateJSONBase(folderContent)).build();
+            }
+            return Response.status(Constant.Constant.EROR).build();
+
+        } catch (Exception ex) {
+            return Response.status(Constant.Constant.EROR).build();
+        }
     }
 }
