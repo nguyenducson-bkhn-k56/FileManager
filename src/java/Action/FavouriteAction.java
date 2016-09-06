@@ -5,6 +5,7 @@
  */
 package Action;
 
+import Constant.Constant;
 import Dao.FileDao;
 import Entity.FolderContent;
 import com.sun.jersey.multipart.FormDataParam;
@@ -47,24 +48,24 @@ public class FavouriteAction {
         try {
             File tempFile = File.createTempFile("tempFile", ".tmp");
             writeToFile(fileInputStream, tempFile.getAbsolutePath());
-            Response result = Response.status(Constant.Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
+            Response result = Response.status(Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
 //        fileDao.addNewFile(parentPath,name,fileType);
             return result;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return Response.status(Constant.Constant.EROR).entity("loi up file").build();
+            return Response.status(Constant.EROR).entity("loi up file").build();
         }
     }
 
     @POST
     @Path("/moveFileFavoriteToFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath,@FormParam("userId") String userId, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
+    public Response moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath, @FormParam("userId") String userId, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
         FileDao fileDao = new FileDao();
         File fileTemp = new File(absolutePath);
         fileType = FilenameUtils.getExtension(fileName);
         fileName = FilenameUtils.getBaseName(fileName);
-        String newFilePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId +"/"  + fileName + "." + fileType;
+        String newFilePath = Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId + "/" + fileName + "." + fileType;
         File newFile = new File(newFilePath);
         try {
             InputStream inStream = null;
@@ -92,15 +93,15 @@ public class FavouriteAction {
 
             System.out.println("File is copied successful!");
 
-            if (fileDao.addNewFile( fileName, ".docx",new File(Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId +"/" +Constant.Constant.FILE_CONFIG))) {
-                return Constant.Constant.NORMAL;
+            if (fileDao.addNewFile(fileName, fileType, new File(Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId + "/" + Constant.FILE_CONFIG))) {
+                return Response.status(Constant.NORMAL).build();
             } else {
-                return Constant.Constant.EROR;
+                return Response.status(Constant.EROR).build();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return Constant.Constant.EROR;
+        return Response.status(Constant.EROR).build();
     }
 
     private void writeToFile(InputStream uploadedInputStream,
@@ -132,18 +133,22 @@ public class FavouriteAction {
     @Path("/downloadFile")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response downloadFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("idUser") String idUser, @FormParam("fileType") String fileType) {
-        String filePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + parentPath.replace("root", idUser) + "/" + name + fileType;
+    public Response downloadFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("userId") String idUser, @FormParam("fileType") String fileType) {
+        String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + parentPath.replace("root/", "") + "/" + name + "." + fileType;
         File file = new File(filePath);
+        if (!file.exists()) {
+            return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
+        }
         Response.ResponseBuilder response = Response.ok((Object) file);
         response.header("Content-Disposition", "attachment; filename=newfile.zip");
         return response.build();
     }
 
-    /***
-     * 
+    /**
+     * *
+     *
      * @param userId
-     * @return 
+     * @return
      */
     @POST
     @Path("/getListFileFavourite")
@@ -151,21 +156,60 @@ public class FavouriteAction {
     public Response getListFileFavourite(@FormParam("userId") String userId) {
 
         try {
-            String filePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.Constant.FILE_CONFIG;
+            String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
             File fileConfig = new File(filePath);
             if (!fileConfig.exists()) {
-                return Response.status(Constant.Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
+                return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
             }
             FolderContent folderContent = (FolderContent) JsonBase.readFileJson(fileConfig, FolderContent.class);
             if (folderContent != null) {
-                return Response.status(Constant.Constant.NORMAL).entity(JsonBase.generateJSONBase(folderContent)).build();
+                return Response.status(Constant.NORMAL).entity(JsonBase.generateJSONBase(folderContent)).build();
             }
-            return Response.status(Constant.Constant.EROR).build();
+            return Response.status(Constant.EROR).build();
 
         } catch (Exception ex) {
-            return Response.status(Constant.Constant.EROR).build();
+            return Response.status(Constant.EROR).build();
         }
     }
-    
-    
+
+    @POST
+    @Path("/delFileFavourite")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response delFileFavourite(@FormParam("parentPath") String parentPath, @FormParam("userId") String userId, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
+        try {
+            FileDao dao = new FileDao();
+            String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
+            File fileConfig = new File(filePath);
+            if (!fileConfig.exists()) {
+                return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
+            }
+            if (dao.delFile(parentPath, fileName, userId, fileConfig)) {
+                return Response.status(Constant.NORMAL).build();
+            }
+        } catch (Exception ex) {
+            return Response.status(Constant.EROR).build();
+        }
+        
+            return Response.status(Constant.EROR).build();
+    }
+
+    @POST
+    @Path("/renameFile")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response renameFileFavourite(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.USERID) String userId, @FormParam(Constant.Param.FILENAME) String fileName, @FormParam(Constant.Param.NEWNAME) String newName, @FormParam(Constant.Param.FILETYPE) String fileType) {
+        try {
+
+            FileDao dao = new FileDao();
+            String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
+            File fileConfig = new File(filePath);
+            if (!fileConfig.exists()) {
+                return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
+            }
+            dao.editFileName(parentPath, fileName, newName, userId, fileConfig);
+            return Response.status(Constant.NORMAL).build();
+        } catch (Exception ex) {
+            return Response.status(Constant.EROR).build();
+        }
+    }
+
 }

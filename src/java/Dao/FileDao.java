@@ -72,6 +72,50 @@ public class FileDao {
         }
     }
 
+    public boolean editFileName(String parentPath, String name,String newName, String userId, File file) {
+        try {
+
+            FolderContent rootFolder;
+            boolean isFound = false; //
+            rootFolder = JsonBase.readFileJson(file);
+            ArrayList<FolderContent> listFolderContentTemp = new ArrayList<FolderContent>();
+            listFolderContentTemp.add(rootFolder);
+            // tim ra folder trong parent
+            isFound = true;
+
+            // found file in list
+            Integer positionTempFile = 0;
+            FileContent fileContentNeedEdit = null;
+            ArrayList<FileContent> lstFileContent = rootFolder.getListFiles();
+            for (FileContent tempFileContent : lstFileContent) {
+                if (tempFileContent.getName().equals(name)) {
+                    fileContentNeedEdit = tempFileContent;
+                    break;
+                }
+                positionTempFile++;
+            }
+
+            if (!isFound) {
+                return false;
+            }
+
+            // tao folder moi
+            // xoa file
+            String filePathHW = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + fileContentNeedEdit.getParentPath().replace(Constant.Constant.NAME_ROOT_FOLDER, "") + "/" + fileContentNeedEdit.getName() + "." + fileContentNeedEdit.getFileType();
+            File fileHw = new File(filePathHW);
+            String newFilePathHw = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + fileContentNeedEdit.getParentPath().replace(Constant.Constant.NAME_ROOT_FOLDER, "") + "/" + newName + "." + fileContentNeedEdit.getFileType();
+            if (fileHw.exists() && fileHw.renameTo(new File(newFilePathHw))) {
+                fileContentNeedEdit.setName(newName);
+                fileContentNeedEdit.setUrl(fileContentNeedEdit.getParentPath()+"/" +newName +"." +fileContentNeedEdit.getFileType());
+                JsonBase.writeFileJson(JsonBase.generateJSONBase(rootFolder), file);
+            }
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+    
+    
     public boolean editFileName(String parentPath, String oldName, String newName) {
         try {
 
@@ -185,7 +229,7 @@ public class FileDao {
             return false;
         }
     }
-    
+
     public boolean addNewFile(String parentPath, String name, String fileType) {
         try {
 
@@ -217,7 +261,7 @@ public class FileDao {
             }
 
             // tao folder moi
-            String pathNewFile = JsonBase.pathFolderRoot + destinyFolderContent.getPath().replace("root/", "") + "/" + name+fileType;
+            String pathNewFile = JsonBase.pathFolderRoot + destinyFolderContent.getPath().replace("root/", "") + "/" + name + "." + fileType;
             File newFile = new File(pathNewFile);
             if (!newFile.exists()) {
                 return false;
@@ -243,8 +287,8 @@ public class FileDao {
             return false;
         }
     }
-     
-    public boolean addNewFile( String nameFile, String fileType, File file) {
+
+    public boolean addNewFile(String nameFile, String fileType, File file) {
         try {
 
             FolderContent rootFolder;
@@ -254,14 +298,13 @@ public class FileDao {
             listFolderContentTemp.add(rootFolder);
             // tim ra folder trong parent
             isFound = true;
-            
 
             if (!isFound) {
                 return false;
             }
 
             // tao folder moi
-            String pathNewFile = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH +"/" + rootFolder.getPath().replace("root/", "") + "/" + nameFile+fileType;
+            String pathNewFile = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + rootFolder.getPath().replace("root/", "") + "/" + nameFile + "." + fileType;
             File newFile = new File(pathNewFile);
             if (!newFile.exists()) {
                 return false;
@@ -281,15 +324,57 @@ public class FileDao {
                 lstFilesContent.add(fileContentNew);
                 rootFolder.setListFiles(lstFilesContent);
             }
-            JsonBase.writeFileJson(JsonBase.generateJSONBase(rootFolder),file);
+            JsonBase.writeFileJson(JsonBase.generateJSONBase(rootFolder), file);
             return true;
         } catch (Exception ex) {
             return false;
         }
     }
-    
+
+    public boolean delFile(String parentPath, String name, String userId, File file) {
+        try {
+
+            FolderContent rootFolder;
+            boolean isFound = false; //
+            rootFolder = JsonBase.readFileJson(file);
+            ArrayList<FolderContent> listFolderContentTemp = new ArrayList<FolderContent>();
+            listFolderContentTemp.add(rootFolder);
+            // tim ra folder trong parent
+            isFound = true;
+
+            // found file in list
+            int positionTempFile = 0;
+            FileContent fileContentNeedDel = null;
+            ArrayList<FileContent> lstFileContent = rootFolder.getListFiles();
+            for (FileContent tempFileContent : lstFileContent) {
+                if (tempFileContent.getName().equals(name)) {
+                    fileContentNeedDel = tempFileContent;
+                    break;
+                }
+                positionTempFile++;
+            }
+
+            if (!isFound) {
+                return false;
+            }
+
+            // tao folder moi
+            // xoa file
+            String filePathHW = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH + fileContentNeedDel.getParentPath().replace(Constant.Constant.NAME_ROOT_FOLDER, "") + "/" + fileContentNeedDel.getName() + "." + fileContentNeedDel.getFileType();
+            File fileHw = new File(filePathHW);
+            if (fileHw.exists() && fileHw.delete()) {
+                rootFolder.getListFiles().remove(positionTempFile);
+              
+                JsonBase.writeFileJson(JsonBase.generateJSONBase(rootFolder), file);
+            }
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
     public boolean delFile(String parentPath, String name) {
-          try {
+        try {
 
             String arrayFile[] = parentPath.replace("/", "-").split("-");
             FolderContent tempFolderContent;
@@ -320,7 +405,7 @@ public class FileDao {
 
             // tim file can edit
             FileContent fileNeedRemove = null;
-            int posFileNeedRemove=0;
+            int posFileNeedRemove = 0;
             ArrayList<FileContent> listFileTemp = destinyFolderContent.getListFiles();
             if (listFileTemp == null) {
                 return false;
@@ -335,12 +420,13 @@ public class FileDao {
             if (fileNeedRemove == null) {
                 return false;
             }
-            
-            File file = new File(JsonBase.pathRoot+"/" + fileNeedRemove.getParentPath().replace("root/", "") +"/"+fileNeedRemove.getName());
-            if(file.exists()){
-                if(!file.delete())
+
+            File file = new File(JsonBase.pathRoot + "/" + fileNeedRemove.getParentPath().replace("root/", "") + "/" + fileNeedRemove.getName());
+            if (file.exists()) {
+                if (!file.delete()) {
                     return false;
-            }else{
+                }
+            } else {
                 return false;
             }
             destinyFolderContent.getListFiles().remove(posFileNeedRemove);
@@ -350,9 +436,9 @@ public class FileDao {
             return false;
         }
     }
-    
+
     public boolean delFolder(String parentPath, String name) {
-           try {
+        try {
 
             String arrayFile[] = parentPath.replace("/", "-").split("-");
             FolderContent tempFolderContent;
@@ -382,13 +468,12 @@ public class FileDao {
             }
 
             // tim folder can edit
-            
-             // tim folder can edit
-            int posOfFolderNeedDelete=0;
+            // tim folder can edit
+            int posOfFolderNeedDelete = 0;
             FolderContent folderNeedRemove = null;
             for (FolderContent folder : listFolderContentTemp) {
-                
-                if (folder.getName()!=null && folder.getName().equals(name)) {
+
+                if (folder.getName() != null && folder.getName().equals(name)) {
                     folderNeedRemove = folder;
                     break;
                 }
@@ -397,13 +482,13 @@ public class FileDao {
             if (folderNeedRemove == null) {
                 return false;
             }
-            
-            
-            File folder = new File(JsonBase.pathFolderRoot+"/" + folderNeedRemove.getParentPath().replace("root/", "") +"/"+folderNeedRemove.getName());
-            if(folder.exists()){
-                if(!folder.delete())
+
+            File folder = new File(JsonBase.pathFolderRoot + "/" + folderNeedRemove.getParentPath().replace("root/", "") + "/" + folderNeedRemove.getName());
+            if (folder.exists()) {
+                if (!folder.delete()) {
                     return false;
-            }else{
+                }
+            } else {
                 return false;
             }
             destinyFolderContent.getListFolders().remove(posOfFolderNeedDelete);
@@ -413,7 +498,6 @@ public class FileDao {
             return false;
         }
     }
-
 
     public void updateFileAfterEdit(FolderContent folder) {
         folder.setPath(folder.getParentPath() + "/" + folder.getName());
@@ -433,9 +517,5 @@ public class FileDao {
             }
         }
     }
-    
-    
 
-
-   
 }

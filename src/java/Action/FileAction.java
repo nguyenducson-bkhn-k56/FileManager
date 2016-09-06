@@ -64,20 +64,19 @@ import org.apache.http.entity.mime.MultipartEntity;
 @Path("/fileManager")
 public class FileAction {
 
-   public static String root = "fileManager";
+    public static String root = "fileManager";
 
     @POST
     @Path("/addFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name){
+    public Integer addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
         FileDao dao = new FileDao();
         if (dao.addNewFolder(parentPath, name)) {
             return Constant.Constant.NORMAL;
         }
-       return Constant.Constant.EROR;
+        return Constant.Constant.EROR;
     }
-    
-    
+
     //xoa folder 
     @DELETE
     @Path("/deleteFolder")
@@ -123,7 +122,7 @@ public class FileAction {
     @Path("/getListAllFile")
     public Response getListAllFile() {
         FileDao fileDao = new FileDao();
-        return Response.status(Response.Status.OK).entity(fileDao.getListAllFile()).build();
+        return Response.status(Constant.Constant.NORMAL).entity(fileDao.getListAllFile()).build();
     }
 //
 //    // thay doi ten file
@@ -151,10 +150,8 @@ public class FileAction {
         ResponseBuilder response = Response.ok((Object) file);
         response.header("Content-Disposition", "attachment; filename=newfile.zip");
         return response.build();
-
     }
 
-    
     private void writeToFile(InputStream uploadedInputStream,
             String uploadedFileLocation) throws IOException {
         FileOutputStream out = null;
@@ -166,7 +163,7 @@ public class FileAction {
             File file = new File(uploadedFileLocation);
             out = new FileOutputStream(file);
             int length;
-            while ((read = uploadedInputStream.read(bytes)) >0) {
+            while ((read = uploadedInputStream.read(bytes)) > 0) {
                 out.write(bytes, 0, read);
             }
 
@@ -184,18 +181,15 @@ public class FileAction {
     @Consumes("binary/octet-stream")
     public Response upload(@FormDataParam("file") InputStream fileInputStream
     ) {
-        String uploadedFileLocation = "E://" + "temp2.docx";
-//        FileDao fileDao = new FileDao();
-//        // save it
+        Response result;
+        try {
+            File tempFile = File.createTempFile("tempFile", ".tmp");
+            writeToFile(fileInputStream, tempFile.getAbsolutePath());
+            result = Response.status(Constant.Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
 
-        String output = "File uploaded to : " + uploadedFileLocation;
-        System.out.println(output);
-        try{
-        writeToFile(fileInputStream, uploadedFileLocation);
-        }catch(IOException ex){
-            return Response.status(1).entity(output).build();
+        } catch (IOException ex) {
+            return Response.status(Constant.Constant.EROR).entity("loi tao file").build();
         }
-        Response result = Response.status(200).entity(output).build();
 //        fileDao.addNewFile(parentPath,name,fileType);
         return result;
     }
@@ -203,12 +197,13 @@ public class FileAction {
     @POST
     @Path("/moveFileToDes")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer moveFileToDes(@FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName) {
+    public Response moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName) {
         FileDao fileDao = new FileDao();
-        File fileTemp = new File("E://" + "temp2.docx");
-        String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName + ".docx";
+        File fileTemp = new File(absolutePath);
         String fileType = FilenameUtils.getExtension(fileName);
         fileName = FilenameUtils.getBaseName(fileName);
+        
+        String newFilePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + fileName +"." + fileType;
         File newFile = new File(newFilePath);
         try {
             InputStream inStream = null;
@@ -236,15 +231,15 @@ public class FileAction {
 
             System.out.println("File is copied successful!");
 
-            if(fileDao.addNewFile(parentPath, fileName, fileType))
-                return Constant.Constant.NORMAL;
-            else
-                return Constant.Constant.EROR;
+            if (fileDao.addNewFile(parentPath, fileName, fileType)) {
+                return Response.status(Constant.Constant.NORMAL).build();
+            } else {
+                return Response.status(Constant.Constant.EROR).build();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return Constant.Constant.EROR;
+        return Response.status(Constant.Constant.EROR).build();
     }
-    
 
 }
