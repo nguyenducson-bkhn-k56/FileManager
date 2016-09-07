@@ -24,6 +24,11 @@ public class Constant {
     public static final String NAME_ROOT_FOLDER = "root";
     public static final String FILE_CONFIG = "config.txt";
     public static final String PATH_FOLDER_TEMP_FILE = "D:/favourite/";
+    public static final String NAME_FILE_ROOT_FAVOUR = "/favourite";
+    public static final String NAME_FILE_ROOT_FOLDER = "/root";
+    public static String FOLDER_PATH_HW = "";
+    public static final String ROOT_FOLDER_NAME = "smartOFF";
+    public static final String ROOT_FOLDER_FAVOURITE_NAME = "smartOFFFavourite";
     // user 
     public final  class Param{
         public Param(){

@@ -33,6 +33,7 @@ public class ApplicationConfig extends Application {
 //        resources.add(org.glassfish.jersey.media.multipart.MultiPartProperties.Feature.MultiPartContextResolver.class);
 //        resources.add(org.glassfish.jersey.media.multipart.MultiPartProperties.Feature.MultiPartContextResolver.class);
         resources.add(Action.FileAction.class);
+        resources.add(Action.FolderAction.class);
         resources.add(Action.UserAction.class);
         resources.add(test.Test.class);
     }

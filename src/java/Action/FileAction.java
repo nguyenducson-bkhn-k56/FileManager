@@ -70,16 +70,16 @@ public class FileAction {
     @POST
     @Path("/addFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer addFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
+    public Response addFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
         if (dao.addNewFolder(parentPath, name)) {
-            return Constant.NORMAL;
+            return Response.status(Constant.NORMAL).build();
         }
-        return Constant.EROR;
+        return Response.status(Constant.EROR).build();
     }
 
     //xoa folder 
-    @DELETE
+    @POST
     @Path("/deleteFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Integer delFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
