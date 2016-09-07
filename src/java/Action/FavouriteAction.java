@@ -39,7 +39,8 @@ import org.apache.commons.io.FilenameUtils;
 public class FavouriteAction {
 
     public static String root = "FavouriteAction";
-
+    
+    // upload file va ghi vao trang thai file tam
     @POST
     @Path("/uploadFileFavourite")
     @Consumes("binary/octet-stream")
@@ -49,7 +50,6 @@ public class FavouriteAction {
             File tempFile = File.createTempFile("tempFile", ".tmp");
             writeToFile(fileInputStream, tempFile.getAbsolutePath());
             Response result = Response.status(Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
-//        fileDao.addNewFile(parentPath,name,fileType);
             return result;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -57,10 +57,11 @@ public class FavouriteAction {
         }
     }
 
+    // chuyen file da upload vao dung folder cua nguoi su dung
     @POST
     @Path("/moveFileFavoriteToFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath, @FormParam("userId") String userId, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
+    public Response moveFileToDes(@FormParam(Constant.Param.ABSOLUTEPATH) String absolutePath, @FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.USERID) String userId, @FormParam(Constant.Param.FILENAME) String fileName, @FormParam(Constant.Param.FILETYPE) String fileType) {
         FileDao fileDao = new FileDao();
         File fileTemp = new File(absolutePath);
         fileType = FilenameUtils.getExtension(fileName);
@@ -104,6 +105,7 @@ public class FavouriteAction {
         return Response.status(Constant.EROR).build();
     }
 
+    // ghi vao file tam 
     private void writeToFile(InputStream uploadedInputStream,
             String uploadedFileLocation) throws IOException {
         FileOutputStream out = null;
@@ -128,12 +130,13 @@ public class FavouriteAction {
 
     }
 
-    // ham download file 
+    // OutsoureTeam-sonnd
+    // download file 
     @POST
     @Path("/downloadFile")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response downloadFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("userId") String idUser, @FormParam("fileType") String fileType) {
+    public Response downloadFile(@FormParam(Constant.Param.ABSOLUTEPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.USERID) String idUser, @FormParam(Constant.Param.FILETYPE) String fileType) {
         String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + parentPath.replace("root/", "") + "/" + name + "." + fileType;
         File file = new File(filePath);
         if (!file.exists()) {
@@ -172,6 +175,7 @@ public class FavouriteAction {
         }
     }
 
+    // xoa file favourite theo ten
     @POST
     @Path("/delFileFavourite")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -189,10 +193,19 @@ public class FavouriteAction {
         } catch (Exception ex) {
             return Response.status(Constant.EROR).build();
         }
-        
-            return Response.status(Constant.EROR).build();
+
+        return Response.status(Constant.EROR).build();
     }
 
+    /***
+     * doi ten file favourite
+     * @param parentPath
+     * @param userId
+     * @param fileName
+     * @param newName
+     * @param fileType
+     * @return 
+     */
     @POST
     @Path("/renameFile")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

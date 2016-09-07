@@ -5,6 +5,7 @@
  */
 package Action;
 
+import Constant.Constant;
 import Dao.FileDao;
 import Entity.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
@@ -69,24 +70,24 @@ public class FileAction {
     @POST
     @Path("/addFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer addFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public Integer addFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
         if (dao.addNewFolder(parentPath, name)) {
-            return Constant.Constant.NORMAL;
+            return Constant.NORMAL;
         }
-        return Constant.Constant.EROR;
+        return Constant.EROR;
     }
 
     //xoa folder 
     @DELETE
     @Path("/deleteFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer delFolder(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public Integer delFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
         if (dao.delFolder(parentPath, name)) {
-            return Constant.Constant.NORMAL;
+            return Constant.NORMAL;
         }
-        return Constant.Constant.EROR;
+        return Constant.EROR;
     }
 //
     // ham sua doi ten folder
@@ -94,13 +95,13 @@ public class FileAction {
     @POST
     @Path("/editFolderName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer editFolderName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
+    public Integer editFolderName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
 
         FileDao dao = new FileDao();
         if (dao.editFolder(parentPath, name, newName)) {
-            return Constant.Constant.NORMAL;
+            return Constant.NORMAL;
         }
-        return Constant.Constant.EROR;
+        return Constant.EROR;
 
     }
 
@@ -108,12 +109,12 @@ public class FileAction {
     @POST
     @Path("/delFile")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer removeFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public Integer removeFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
         if (dao.delFile(parentPath, name)) {
-            return Constant.Constant.NORMAL;
+            return Constant.NORMAL;
         }
-        return Constant.Constant.EROR;
+        return Constant.EROR;
     }
 //
     // lay danh sach tat cac cac file
@@ -122,7 +123,7 @@ public class FileAction {
     @Path("/getListAllFile")
     public Response getListAllFile() {
         FileDao fileDao = new FileDao();
-        return Response.status(Constant.Constant.NORMAL).entity(fileDao.getListAllFile()).build();
+        return Response.status(Constant.NORMAL).entity(fileDao.getListAllFile()).build();
     }
 //
 //    // thay doi ten file
@@ -130,12 +131,12 @@ public class FileAction {
     @POST
     @Path("/editFileName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer editFileName(@FormParam("parentPath") String parentPath, @FormParam("name") String name, @FormParam("newName") String newName) {
+    public Integer editFileName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
         FileDao dao = new FileDao();
         if (dao.editFileName(parentPath, name, newName)) {
-            return Constant.Constant.NORMAL;
+            return Constant.NORMAL;
         }
-        return Constant.Constant.EROR;
+        return Constant.EROR;
 
     }
 
@@ -144,7 +145,7 @@ public class FileAction {
     @Path("/downloadFile")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response downloadFile(@FormParam("parentPath") String parentPath, @FormParam("name") String name) {
+    public Response downloadFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         String filePath = JsonBase.pathFolderRoot + parentPath.replace("root/", "") + "/" + name + ".docx";
         File file = new File(filePath);
         ResponseBuilder response = Response.ok((Object) file);
@@ -185,10 +186,10 @@ public class FileAction {
         try {
             File tempFile = File.createTempFile("tempFile", ".tmp");
             writeToFile(fileInputStream, tempFile.getAbsolutePath());
-            result = Response.status(Constant.Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
+            result = Response.status(Constant.NORMAL).entity(tempFile.getAbsolutePath()).build();
 
         } catch (IOException ex) {
-            return Response.status(Constant.Constant.EROR).entity("loi tao file").build();
+            return Response.status(Constant.EROR).entity("loi tao file").build();
         }
 //        fileDao.addNewFile(parentPath,name,fileType);
         return result;
@@ -197,7 +198,7 @@ public class FileAction {
     @POST
     @Path("/moveFileToDes")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response moveFileToDes(@FormParam("absolutePath") String absolutePath, @FormParam("parentPath") String parentPath, @FormParam("fileName") String fileName) {
+    public Response moveFileToDes(@FormParam(Constant.Param.ABSOLUTEPATH) String absolutePath, @FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.FILENAME) String fileName) {
         FileDao fileDao = new FileDao();
         File fileTemp = new File(absolutePath);
         String fileType = FilenameUtils.getExtension(fileName);
@@ -232,14 +233,14 @@ public class FileAction {
             System.out.println("File is copied successful!");
 
             if (fileDao.addNewFile(parentPath, fileName, fileType)) {
-                return Response.status(Constant.Constant.NORMAL).build();
+                return Response.status(Constant.NORMAL).build();
             } else {
-                return Response.status(Constant.Constant.EROR).build();
+                return Response.status(Constant.EROR).build();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return Response.status(Constant.Constant.EROR).build();
+        return Response.status(Constant.EROR).build();
     }
 
 }
