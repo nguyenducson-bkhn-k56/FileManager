@@ -32,6 +32,11 @@ public class FolderAction {
 
     public static String ROOT = "manager/folderAction";
 
+    /**
+     * *
+     *
+     * @return
+     */
     @GET
     @Path("/getListData")
     public Response getListData() {
@@ -47,11 +52,13 @@ public class FolderAction {
         }
     }
 
-    /***
+    /**
+     * *
      * them file moi
+     *
      * @param parentPath
      * @param name
-     * @return 
+     * @return
      */
     @POST
     @Path("/addFolder")
@@ -59,6 +66,7 @@ public class FolderAction {
     public Response addFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
 
         try {
+            name = name.trim();
             FileDao dao = new FileDao();
             File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
             if (dao.addNewFolder(parentPath, name, fileConfig)) {
@@ -68,6 +76,50 @@ public class FolderAction {
             ex.printStackTrace();
         }
         return Response.status(Constant.EROR).build();
+    }
+
+    /**
+     * *
+     * them file moi
+     *
+     * @param parentPath
+     * @param name
+     * @return
+     */
+    @POST
+    @Path("/editFolderName")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Integer editFolderName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
+        name = name.trim();
+        newName = newName.trim();
+        FileDao dao = new FileDao();
+        File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
+        if (dao.editFolder(parentPath, name, newName, fileConfig)) {
+            return Constant.NORMAL;
+        }
+        return Constant.EROR;
+
+    }
+
+    /**
+     * *
+     * xoa folder
+     *
+     * @param parentPath
+     * @param name
+     * @return
+     */
+    @POST
+    @Path("/deleteFolder")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Integer delFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
+        FileDao dao = new FileDao();
+        name = name.trim();
+        File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
+        if (dao.delFolder(parentPath, name,fileConfig)) {
+            return Constant.NORMAL;
+        }
+        return Constant.EROR;
     }
 
 }

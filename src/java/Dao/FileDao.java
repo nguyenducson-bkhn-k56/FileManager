@@ -79,7 +79,7 @@ public class FileDao {
 
     public boolean editFolder(String parentPath, String oldName, String newName, File file) {
         try {
-
+            
             String arrayFile[] = parentPath.replace("/", "-").split("-");
             FolderContent tempFolderContent;
             FolderContent destinyFolderContent = null;
@@ -117,6 +117,19 @@ public class FileDao {
             }
             if (folderNeedEdit == null) {
                 return false;
+            }
+            
+            String pathOldFolder = Constant.FOLDER_PATH_HW+"/" + folderNeedEdit.getParentPath().replace("root/", "").replace("/root", "").replace("root", "") + "/" + folderNeedEdit.getName();
+            File oldFolder = new File(pathOldFolder);
+            String pathNewFolder = Constant.FOLDER_PATH_HW+"/" + folderNeedEdit.getParentPath().replace("root/", "").replace("/root", "").replace("root", "") + "/" + newName;
+            File newFolder = new File(pathNewFolder);
+           
+            if (!oldFolder.exists()) {
+                return false;
+            } else {
+                if (!oldFolder.renameTo(newFolder)) {
+                    return false;
+                }
             }
             folderNeedEdit.setName(newName);
             updateFileAfterEdit(folderNeedEdit);
@@ -662,12 +675,9 @@ public class FileDao {
                 return false;
             }
 
-            File folder = new File(JsonBase.pathFolderRoot + "/" + folderNeedRemove.getParentPath().replace("root/", "") + "/" + folderNeedRemove.getName());
+            File folder = new File(Constant.FOLDER_PATH_HW+"/" + folderNeedRemove.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + folderNeedRemove.getName());
             if (folder.exists()) {
                 FileUtils.deleteDirectory(folder);
-//                if (!folder.delete()) {
-//                    return false;
-//                }
                 if (folder.exists()) {
                     return false;
                 }
