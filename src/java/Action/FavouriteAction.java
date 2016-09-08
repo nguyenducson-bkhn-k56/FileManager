@@ -94,7 +94,7 @@ public class FavouriteAction {
 
             System.out.println("File is copied successful!");
 
-            if (fileDao.addNewFile(fileName, fileType, new File(Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId + "/" + Constant.FILE_CONFIG))) {
+            if (fileDao.addNewFileFavourite(fileName, fileType, new File(Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId + "/" + Constant.FILE_CONFIG))) {
                 return Response.status(Constant.NORMAL).build();
             } else {
                 return Response.status(Constant.EROR).build();
@@ -187,7 +187,7 @@ public class FavouriteAction {
             if (!fileConfig.exists()) {
                 return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
             }
-            if (dao.delFile(parentPath, fileName, userId, fileConfig)) {
+            if (dao.delFileFavourite(parentPath, fileName, userId, fileConfig)) {
                 return Response.status(Constant.NORMAL).build();
             }
         } catch (Exception ex) {
@@ -218,7 +218,7 @@ public class FavouriteAction {
             if (!fileConfig.exists()) {
                 return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
             }
-            dao.editFileName(parentPath, fileName, newName, userId, fileConfig);
+            dao.editFileFavourite(parentPath, fileName, newName, userId, fileConfig);
             return Response.status(Constant.NORMAL).build();
         } catch (Exception ex) {
             return Response.status(Constant.EROR).build();
