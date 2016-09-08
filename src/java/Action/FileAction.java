@@ -61,7 +61,7 @@ public class FileAction {
     @Path("/moveFileToDes")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response moveFileToDes(@FormParam(Constant.Param.ABSOLUTEPATH) String absolutePath, @FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.FILENAME) String fileName) {
-
+        fileName = fileName.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
 
         FileDao fileDao = new FileDao();
@@ -114,6 +114,8 @@ public class FileAction {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response downloadFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.FILETYPE) String fileType) {
+        name = name.trim();
+        fileType = fileType.trim();
         String filePath = Constant.FOLDER_PATH_HW + "/" + parentPath.replace("root/", "").replace("/root", "").replace("root", "") + "/" + name + "." + fileType;
         File file = new File(filePath);
         Response.ResponseBuilder response = Response.ok((Object) file);
@@ -149,6 +151,8 @@ public class FileAction {
     @Path("/editFileName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Integer editFileName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
+        name = name.trim();
+        newName = newName.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
         FileDao dao = new FileDao();
         if (dao.editFileName(parentPath, name, newName, fileConfig)) {
@@ -163,9 +167,10 @@ public class FileAction {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Integer removeFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
+        name = name.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
 
-        if (dao.delFile(parentPath, name)) {
+        if (dao.delFile(parentPath, name,fileConfig)) {
             return Constant.NORMAL;
         }
         return Constant.EROR;

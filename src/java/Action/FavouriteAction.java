@@ -157,7 +157,6 @@ public class FavouriteAction {
     @Path("/getListFileFavourite")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getListFileFavourite(@FormParam("userId") String userId) {
-
         try {
             String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
             File fileConfig = new File(filePath);
