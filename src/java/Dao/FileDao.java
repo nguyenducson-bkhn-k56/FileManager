@@ -118,9 +118,9 @@ public class FileDao {
 
             // tao folder moi
             // xoa file
-            String filePathHW = Constant.FAVOUR_ROOT_FOLDER_PATH + fileContentNeedEdit.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + fileContentNeedEdit.getName() + "." + fileContentNeedEdit.getFileType();
+            String filePathHW = Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + fileContentNeedEdit.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + fileContentNeedEdit.getName() + "." + fileContentNeedEdit.getFileType();
             File fileHw = new File(filePathHW);
-            String newFilePathHw = Constant.FAVOUR_ROOT_FOLDER_PATH + fileContentNeedEdit.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + newName + "." + fileContentNeedEdit.getFileType();
+            String newFilePathHw = Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + fileContentNeedEdit.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + newName + "." + fileContentNeedEdit.getFileType();
             if (fileHw.exists() && fileHw.renameTo(new File(newFilePathHw))) {
                 fileContentNeedEdit.setName(newName);
                 fileContentNeedEdit.setUrl(fileContentNeedEdit.getParentPath() + "/" + newName + "." + fileContentNeedEdit.getFileType());
@@ -279,7 +279,7 @@ public class FileDao {
             FolderContent rootFolder;
             boolean isFound = false; //
             rootFolder = JsonBase.readFileJson(fileConfig);
-            ArrayList<FolderContent> listFolderContentTemp = new ArrayList<FolderContent>();
+            ArrayList<FolderContent> listFolderContentTemp = new ArrayList<>();
             listFolderContentTemp.add(rootFolder);
             // tim ra folder trong parent
             for (String nameFolderTemp : arrayFile) {
@@ -344,7 +344,7 @@ public class FileDao {
             }
 
             // tao folder moi
-            String pathNewFile = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + rootFolder.getPath().replace("root/", "") + "/" + nameFile + "." + fileType;
+            String pathNewFile = Constant.FOLDER_PATH_HW +"/" + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + rootFolder.getPath().replace("root/", "") + "/" + nameFile + "." + fileType;
             File newFile = new File(pathNewFile);
             if (!newFile.exists()) {
                 return false;
@@ -402,7 +402,7 @@ public class FileDao {
 
             // tao folder moi
             // xoa file
-            String filePathHW = Constant.FAVOUR_ROOT_FOLDER_PATH + fileContentNeedDel.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + fileContentNeedDel.getName() + "." + fileContentNeedDel.getFileType();
+            String filePathHW = Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_FAVOURITE_NAME +"/" + fileContentNeedDel.getParentPath().replace(Constant.NAME_ROOT_FOLDER, "") + "/" + fileContentNeedDel.getName() + "." + fileContentNeedDel.getFileType();
             File fileHw = new File(filePathHW);
             if (fileHw.exists() && fileHw.delete()) {
                 rootFolder.getListFiles().remove(positionTempFile);
@@ -590,7 +590,8 @@ public class FileDao {
                     JsonBase.writeFileJson(JsonBase.generateJSONBase(root), fileConfig);
                 }
                 if(folderRootFavourite.mkdir()){
-                    
+                    UserDao userDao = new UserDao();
+                    userDao.create();
                 }else{
                     FileUtils.deleteDirectory(folderRoot);
                 }
@@ -599,4 +600,10 @@ public class FileDao {
 
     }
 
+    
+   
+    
+    public static void main(String args[]){
+        
+    }
 }

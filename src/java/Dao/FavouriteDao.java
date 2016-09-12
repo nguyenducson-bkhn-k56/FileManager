@@ -5,6 +5,7 @@
  */
 package Dao;
 
+import Constant.Constant;
 import Entity.FileContent;
 import Entity.FolderContent;
 import java.io.File;
@@ -17,46 +18,59 @@ import json.JsonBase;
  * @author nguyen
  */
 public class FavouriteDao {
-    public boolean login(String userName,String pass){
-        try{
+
+    public boolean login(String userName, String pass) {
+        try {
             return true;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return false;
     }
-    
+
     // ham tao mot folder favorite
-    public Integer createFolderFavorite(String parentPath,String nameFile){
-        try{           
-            String hwarePath = Constant.Constant.FAVOUR_ROOT_FOLDER_PATH  +  parentPath.replace(Constant.Constant.NAME_ROOT_FOLDER, "") +"/" + nameFile;
-            File folderNew= new File(hwarePath);
-            if(folderNew.exists()){
-                return Constant.Constant.NORMAL;
+    public Integer createFolderFavorite(String parentPath, int  userId) {
+        try {
+            String hwarePath = getPathHW(userId);
+            File folderNew = new File(hwarePath);
+            if (folderNew.exists()) {
+                return Constant.NORMAL;
             }
-            if(!folderNew.mkdir())
-                return Constant.Constant.EROR;
-            File fileConfig = new File(hwarePath+"/"+Constant.Constant.FILE_CONFIG);
-            if(!fileConfig.createNewFile())
-                return Constant.Constant.EXCEPTION;
+            if (!folderNew.mkdirs()) {
+                return Constant.EROR;
+            }
+            File fileConfig = new File(hwarePath + "/" + Constant.FILE_CONFIG);
+            if (!fileConfig.createNewFile()) {
+                return Constant.EXCEPTION;
+            }
             FolderContent folder = new FolderContent();
             folder.setLevel(1);
-            folder.setName(nameFile);
-            folder.setPath(Constant.Constant.NAME_ROOT_FOLDER+"/" + nameFile);
-            folder.setParentPath(Constant.Constant.NAME_ROOT_FOLDER );
+            folder.setName(String.valueOf(userId));
+            folder.setPath("");
+            folder.setParentPath("");
             folder.setListFiles(new ArrayList<FileContent>());
-            if(JsonBase.writeFileJson(JsonBase.generateJSONBase(folder),fileConfig))
-                return Constant.Constant.NORMAL;
-            else {
+            if (JsonBase.writeFileJson(JsonBase.generateJSONBase(folder), fileConfig)) {
+                return Constant.NORMAL;
+            } else {
                 fileConfig.delete();
                 folderNew.delete();
-                return Constant.Constant.EROR;
+                return Constant.EROR;
             }
-        }catch(Exception ex){
-             
+        } catch (Exception ex) {
+
         }
-        return Constant.Constant.EROR;
+        return Constant.EROR;
     }
-    
+
+    public String getPathHW(int idUser) {
+        int numberFolderLevel1 = idUser / Constant.TreeFavourite.LEVEL1MAX;
+        int value = idUser % Constant.TreeFavourite.LEVEL1MAX;
+        int numberFolderLevel2 = value / Constant.TreeFavourite.LEVEL2MAX;
+        value = value % Constant.TreeFavourite.LEVEL2MAX;
+        String labelFolderLevel1 = String.valueOf(numberFolderLevel1 * Constant.TreeFavourite.LEVEL1MAX) + "_" + String.valueOf((numberFolderLevel1 + 1) * (Constant.TreeFavourite.LEVEL1MAX) - 1);
+        String labelFolderLevel2 = String.valueOf(numberFolderLevel1 * Constant.TreeFavourite.LEVEL1MAX + numberFolderLevel2 * Constant.TreeFavourite.LEVEL2MAX) + "_" + String.valueOf(numberFolderLevel1 * Constant.TreeFavourite.LEVEL1MAX + (numberFolderLevel2 + 1) * (Constant.TreeFavourite.LEVEL2MAX) - 1);
+        String pathFile = Constant.FOLDER_PATH_HW+"/"+ Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + Constant.ROOT_FOLDER_FAVOURITE_NAME;
+        return pathFile + "/" + labelFolderLevel1 + "/" + labelFolderLevel2 + "/" + idUser;
+    }
     
 }

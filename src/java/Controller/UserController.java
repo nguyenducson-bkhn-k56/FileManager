@@ -27,7 +27,7 @@ public class UserController {
                 return Response.status(Constant.Constant.WRONG_PASS).build();
             }
             FavouriteDao fDao = new FavouriteDao();
-            if (fDao.createFolderFavorite(Constant.Constant.NAME_ROOT_FOLDER, user.getUserId().toString())==Constant.Constant.NORMAL) {
+            if (fDao.createFolderFavorite(Constant.Constant.NAME_ROOT_FOLDER, user.getUserId())==Constant.Constant.NORMAL) {
                 user.setParentPath(Constant.Constant.NAME_ROOT_FOLDER);
                 user.setFolderName(user.getUserId().toString());
                 return Response.status(Constant.Constant.NORMAL).entity(JsonBase.generateJSONBase(user)).build();

@@ -66,7 +66,7 @@ public class FavouriteAction {
         File fileTemp = new File(absolutePath);
         fileType = FilenameUtils.getExtension(fileName);
         fileName = FilenameUtils.getBaseName(fileName);
-        String newFilePath = Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId + "/" + fileName + "." + fileType;
+        String newFilePath = Constant.FOLDER_PATH_HW +"/"  + Constant.ROOT_FOLDER_FAVOURITE_NAME + parentPath.replace("root/", "").replace("/root", "").replace("root", "") + "/" + userId + "/" + fileName + "." + fileType;
         File newFile = new File(newFilePath);
         try {
             InputStream inStream = null;
@@ -79,9 +79,7 @@ public class FavouriteAction {
             int length;
             //copy the file content in bytes
             while ((length = inStream.read(buffer)) > 0) {
-
                 outStream.write(buffer, 0, length);
-
             }
             inStream.close();
             outStream.close();
@@ -94,7 +92,7 @@ public class FavouriteAction {
 
             System.out.println("File is copied successful!");
 
-            if (fileDao.addNewFileFavourite(fileName, fileType, new File(Constant.FAVOUR_ROOT_FOLDER_PATH + parentPath.replace("root", "") + "/" + userId + "/" + Constant.FILE_CONFIG))) {
+            if (fileDao.addNewFileFavourite(fileName, fileType, new File(Constant.FOLDER_PATH_HW +"/" + Constant.ROOT_FOLDER_FAVOURITE_NAME + parentPath.replace("root", "") + "/" + userId + "/" + Constant.FILE_CONFIG))) {
                 return Response.status(Constant.NORMAL).build();
             } else {
                 return Response.status(Constant.EROR).build();
@@ -137,7 +135,7 @@ public class FavouriteAction {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response downloadFile(@FormParam(Constant.Param.ABSOLUTEPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.USERID) String idUser, @FormParam(Constant.Param.FILETYPE) String fileType) {
-        String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + parentPath.replace("root/", "") + "/" + name + "." + fileType;
+        String filePath =  Constant.FOLDER_PATH_HW +"/"  + Constant.ROOT_FOLDER_FAVOURITE_NAME + parentPath.replace("root/", "").replace("/root", "").replace("root", "") + "/" + name + "." + fileType;
         File file = new File(filePath);
         if (!file.exists()) {
             return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
@@ -158,7 +156,7 @@ public class FavouriteAction {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getListFileFavourite(@FormParam("userId") String userId) {
         try {
-            String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
+            String filePath = Constant.FOLDER_PATH_HW +"/"  + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + userId + "/" + Constant.FILE_CONFIG;
             File fileConfig = new File(filePath);
             if (!fileConfig.exists()) {
                 return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
@@ -181,7 +179,7 @@ public class FavouriteAction {
     public Response delFileFavourite(@FormParam("parentPath") String parentPath, @FormParam("userId") String userId, @FormParam("fileName") String fileName, @FormParam("fileType") String fileType) {
         try {
             FileDao dao = new FileDao();
-            String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
+            String filePath = Constant.FOLDER_PATH_HW +"/"  + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + userId + "/" + Constant.FILE_CONFIG;
             File fileConfig = new File(filePath);
             if (!fileConfig.exists()) {
                 return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
@@ -212,7 +210,7 @@ public class FavouriteAction {
         try {
 
             FileDao dao = new FileDao();
-            String filePath = Constant.FAVOUR_ROOT_FOLDER_PATH + "/" + userId + "/" + Constant.FILE_CONFIG;
+            String filePath = Constant.FOLDER_PATH_HW +"/"  + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + userId + "/" + Constant.FILE_CONFIG;
             File fileConfig = new File(filePath);
             if (!fileConfig.exists()) {
                 return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();

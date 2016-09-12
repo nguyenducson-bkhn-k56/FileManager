@@ -39,6 +39,7 @@ public class FileAction {
 
     public static String ROOT = "manager/file";
 
+    
     @POST
     @Path("/uploadFile")
     @Consumes("binary/octet-stream")

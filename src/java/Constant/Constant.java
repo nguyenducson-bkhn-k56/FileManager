@@ -26,9 +26,9 @@ public class Constant {
     public static final String PATH_FOLDER_TEMP_FILE = "D:/favourite/";
     public static final String NAME_FILE_ROOT_FAVOUR = "/favourite";
     public static final String NAME_FILE_ROOT_FOLDER = "/root";
-    public static String FOLDER_PATH_HW = "";
     public static final String ROOT_FOLDER_NAME = "smartOFF";
     public static final String ROOT_FOLDER_FAVOURITE_NAME = "smartOFFFavourite";
+    public static String FOLDER_PATH_HW = "";
     // user 
     public final  class Param{
         public Param(){
@@ -42,5 +42,12 @@ public class Constant {
         public static final String PARENTPATH = "parentPath";
         public static final String ABSOLUTEPATH = "absolutePath";
         public static final String NEWNAME = "newName";
+    }
+    
+    public final class TreeFavourite{
+        public TreeFavourite(){
+        }
+        public static final int LEVEL1MAX = 10000;
+        public static final int LEVEL2MAX = 100;
     }
 }

@@ -33,7 +33,7 @@ public class FolderAction {
     public static String ROOT = "manager/folderAction";
 
     /**
-     * *
+     ** 
      *
      * @return
      */

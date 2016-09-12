@@ -6,6 +6,7 @@
 package Action;
 
 import Controller.UserController;
+import Dao.FileDao;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
@@ -26,15 +27,22 @@ import javax.ws.rs.core.Response;
  */
 @Path("UserAction")
 public class UserAction {
+
     public static String root = "UserAction";
-    
+
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response logIn(@FormParam("userCode") String userCode, @FormParam("passWord") String passWord){
-        UserController userController = new UserController();
-        return userController.logIn(userCode, passWord);
+    public Response logIn(@FormParam("userCode") String userCode, @FormParam("passWord") String passWord) {
+        try {
+            FileDao fileDao = new FileDao();
+            fileDao.createFolderHW();
+            UserController userController = new UserController();
+            return userController.logIn(userCode, passWord);
+        } catch (Exception ex) {
+
+        }
+        return Response.status(Constant.Constant.EROR).build();
     }
-    
-   
+
 }
