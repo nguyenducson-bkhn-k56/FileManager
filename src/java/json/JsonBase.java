@@ -11,10 +11,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import org.apache.catalina.WebResource;
 
@@ -50,11 +54,12 @@ public class JsonBase {
     // ham ghi file voi gia tri json
     public static boolean writeFileJson(String json) {
         try {
+            
             File file = new File(pathFile);
-            FileWriter fileWrite = new FileWriter(file);
-            fileWrite.write(json);
-            fileWrite.flush();
-            fileWrite.close();
+            OutputStreamWriter write = new OutputStreamWriter(new FileOutputStream(file),"utf-8");
+            write.write(json);
+            write.flush();
+            write.close();
             return true;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
@@ -69,10 +74,9 @@ public class JsonBase {
     // ham doc file tra ve json
     public static FolderContent readFileJson() {
         try {
-            FileReader fileReader = new FileReader(pathFile);
-            StringBuilder data = new StringBuilder();
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(new File(pathFile)),"utf-8");
             Gson gson = new Gson();
-            JsonReader jsonReader = new JsonReader(fileReader);
+            JsonReader jsonReader = new JsonReader(reader);
             FolderContent folderContent = (FolderContent) gson.fromJson(jsonReader, FolderContent.class);
             return folderContent;
         } catch (IOException ex) {
@@ -82,7 +86,60 @@ public class JsonBase {
     }
 
    
+ 
+
     
+    // ham ghi file json vi tri m
+    public static boolean writeFileJson(String json,File fileToWrite){
+       try{
+            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileToWrite), "utf-8");
+            writer.write(json);
+            writer.flush();
+            writer.close();
+            return true;
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    // ham doc json cua file 
+    public static FolderContent readFileJson(File file){
+        try {
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "utf-8");
+            Gson gson = new Gson();
+            JsonReader jsonReader = new JsonReader(reader);
+            FolderContent folderContent = (FolderContent) gson.fromJson(jsonReader, FolderContent.class);
+            return folderContent;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    
+    
+    /***
+     * @author sonnd
+     * read file json and return object T 
+     * @param file
+     * @param classObject
+     * @return 
+     */
+    public static Object readFileJson(File file, Class<?> classObject){
+        try {
+            Object result = null;
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "utf-8");
+            Gson gson = new Gson();
+            JsonReader jsonReader = new JsonReader(reader);
+            result = (Object) gson.fromJson(jsonReader, classObject);
+            return result;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    
+       
 //  
 //
 //    public static void main(String args[]) {
@@ -141,49 +198,4 @@ public class JsonBase {
 //        
 //        
 //    }
-
-    
-    // ham ghi file json vi tri m
-    public static boolean writeFileJson(String json,File fileToWrite){
-       try{
-            FileWriter fileWrite = new FileWriter(fileToWrite);
-            fileWrite.write(json);
-            fileWrite.flush();
-            fileWrite.close();
-            return true;
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return false;
-        }
-    }
-    
-    // ham doc json cua file 
-    public static FolderContent readFileJson(File file){
-        try {
-            FileReader fileReader = new FileReader(file.getAbsolutePath());
-            StringBuilder data = new StringBuilder();
-            Gson gson = new Gson();
-            JsonReader jsonReader = new JsonReader(fileReader);
-            FolderContent folderContent = (FolderContent) gson.fromJson(jsonReader, FolderContent.class);
-            return folderContent;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-    
-    public static Object readFileJson(File file, Class<?> classObject){
-        try {
-            Object result = null;
-            FileReader fileReader = new FileReader(file.getAbsolutePath());
-            StringBuilder data = new StringBuilder();
-            Gson gson = new Gson();
-            JsonReader jsonReader = new JsonReader(fileReader);
-            result = (Object) gson.fromJson(jsonReader, classObject);
-            return result;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
 }
