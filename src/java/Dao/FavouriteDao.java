@@ -29,6 +29,12 @@ public class FavouriteDao {
         return false;
     }
 
+    /****
+     * 
+     * @param parentPath
+     * @param userId
+     * @return 
+     */
     // ham tao mot folder favorite
     public Integer createFolderFavorite(String parentPath, int userId) {
         try {
@@ -47,7 +53,7 @@ public class FavouriteDao {
             FolderContent folder = new FolderContent();
             folder.setLevel(1);
             folder.setName(String.valueOf(userId));
-            folder.setPath("");
+            folder.setPath(String.valueOf(userId));
             folder.setParentPath("");
             folder.setListFiles(new ArrayList<FileContent>());
             if (JsonBase.writeFileJson(JsonBase.generateJSONBase(folder), fileConfig)) {
@@ -155,6 +161,15 @@ public class FavouriteDao {
         }
     }
 
+    
+    /****
+     * 
+     * @param parentPath
+     * @param name
+     * @param userId
+     * @param file
+     * @return 
+     */
     public boolean delFileFavourite(String parentPath, String name, String userId, File file) {
         try {
 
@@ -197,6 +212,15 @@ public class FavouriteDao {
         }
     }
 
+    /***
+     * 
+     * @param parentPath
+     * @param name
+     * @param newName
+     * @param userId
+     * @param file
+     * @return 
+     */
     public boolean editFileFavourite(String parentPath, String name, String newName, String userId, File file) {
         try {
 
@@ -249,7 +273,7 @@ public class FavouriteDao {
      * @param fileConfig
      * @return
      */
-    public boolean createNewFolder(String pathHW, String parentPath, String nameFolder, File fileConfig) {
+    public boolean createNewFolder(String pathHW, String parentPath, String nameFolder, File fileConfig, int userId) {
         try {
             FolderContent rootFolder;
             boolean isFound = false; //
@@ -295,6 +319,7 @@ public class FavouriteDao {
             if (parentPath == null || parentPath.equals("")) {
                 pathNewFile = pathHW + "/" + nameFolder;
             } else {
+                parentPath = parentPath.replaceFirst(String.valueOf(userId)+"/", "");
                 pathNewFile = pathHW + "/" + parentPath + "/" + nameFolder;
             }
 
@@ -302,7 +327,8 @@ public class FavouriteDao {
             // tao folder tuong ung
             File folder = new File(pathNewFile);
             if (!folder.exists()) {
-                folder.mkdir();
+               if(!folder.mkdir())
+                   return false;
             } else {
                 return false;
             }

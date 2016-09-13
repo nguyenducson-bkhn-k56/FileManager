@@ -35,13 +35,13 @@ import org.apache.commons.io.FilenameUtils;
  *
  * @author nguyen
  */
-@Path("FavouriteAction")
+@Path("manager/favourite")
 public class FavouriteAction {
 
-    public static String root = "FavouriteAction";
+    public static String root = "manager/favourite";
 
     /**
-     * *
+     **
      *
      * @param fileInputStream
      * @return
@@ -63,12 +63,12 @@ public class FavouriteAction {
         }
     }
 
-    /****
-     * @author 
-     * @param parentPath
+    /**
+     * **
+     * @author @param parentPath
      * @param userId
      * @param name
-     * @return 
+     * @return
      */
     @POST
     @Path("/createFolder")
@@ -76,11 +76,11 @@ public class FavouriteAction {
     public Response CreateFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.USERID) int userId, @FormParam(Constant.Param.NAME) String name) {
         FavouriteDao fileDao = new FavouriteDao();
         String pathHw = new FavouriteDao().getPathHW(userId);
-        
-        File fileConfig = new File(pathHw + "/" +Constant.FILE_CONFIG);
+        name = name.trim();
+        File fileConfig = new File(pathHw + "/" + Constant.FILE_CONFIG);
         try {
-            
-            fileDao.createNewFolder(pathHw, parentPath, name, fileConfig);
+
+            fileDao.createNewFolder(pathHw, parentPath, name, fileConfig, userId);
             return Response.status(Constant.NORMAL).build();
 
         } catch (Exception ex) {
@@ -96,21 +96,17 @@ public class FavouriteAction {
     public Response delFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.USERID) int userId, @FormParam(Constant.Param.NAME) String name) {
         FavouriteDao fileDao = new FavouriteDao();
         String pathHw = new FavouriteDao().getPathHW(userId);
-
+        name = name.trim();
         try {
-
             int status = fileDao.createFolderFavorite(parentPath, userId);
             return Response.status(status).build();
-
         } catch (Exception ex) {
             ex.printStackTrace();
             return Response.status(Constant.EROR).build();
         }
 
     }
-    
-    
-    
+
     /**
      * **
      *
@@ -135,7 +131,7 @@ public class FavouriteAction {
         if (parentPath == null || parentPath.equals("")) {
             newFilePath = pathHw + "/" + fileName + "." + fileType;
         } else {
-            newFilePath = pathHw + "/" + parentPath + "/" + fileName + "." + fileType;
+            newFilePath = pathHw + "/" + parentPath.replaceFirst(String.valueOf(userId) +"/", "") + "/" + fileName + "." + fileType;
         }
         File newFile = new File(newFilePath);
         try {
@@ -211,8 +207,10 @@ public class FavouriteAction {
     @Path("/downloadFile")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response downloadFile(@FormParam(Constant.Param.ABSOLUTEPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.USERID) String idUser, @FormParam(Constant.Param.FILETYPE) String fileType) {
-        String filePath = Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_FAVOURITE_NAME + parentPath.replace("root/", "").replace("/root", "").replace("root", "") + "/" + name + "." + fileType;
+    public Response downloadFile(@FormParam(Constant.Param.ABSOLUTEPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.USERID) int idUser, @FormParam(Constant.Param.FILETYPE) String fileType) {
+        String pathHW = new FavouriteDao().getPathHW(idUser);
+        parentPath = parentPath.replaceFirst(String.valueOf(idUser) + "/", "");
+        String filePath = pathHW + "/" + parentPath + "/" + name + "." + fileType;
         File file = new File(filePath);
         if (!file.exists()) {
             return Response.status(Constant.EROR_FOLDER_FILE_NOT_EXIST).build();
@@ -297,7 +295,7 @@ public class FavouriteAction {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response renameFileFavourite(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.USERID) String userId, @FormParam(Constant.Param.FILENAME) String fileName, @FormParam(Constant.Param.NEWNAME) String newName, @FormParam(Constant.Param.FILETYPE) String fileType) {
         try {
-            
+
             FavouriteDao dao = new FavouriteDao();
             String filePath = Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + userId + "/" + Constant.FILE_CONFIG;
             File fileConfig = new File(filePath);
@@ -311,4 +309,68 @@ public class FavouriteAction {
         }
     }
 
+    /***
+     * 
+     * @param parentPathSource
+     * @param parentPathDestination
+     * @param filename
+     * @param userId
+     * @param fileType
+     * @return 
+     */
+    @POST
+    @Path("/addFavouriteFromGlobal")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response addFavouriteFromGlobal(@PathParam("parentPathSource") String parentPathSource, @PathParam("parentPathDestination") String parentPathDestination, @PathParam(Constant.Param.FILENAME) String filename,@PathParam(Constant.Param.USERID) int userId ,@PathParam(Constant.Param.FILETYPE) String fileType) {
+        FavouriteDao fileDao = new FavouriteDao();
+        String pathHw = fileDao.getPathHW(userId);
+        String pathFileSource = Constant.FOLDER_PATH_HW + "/" + parentPathSource.replace("root/", "").replace("/root", "").replace("root", "") + "/" + filename + "." + fileType;
+        String pathHWFileDes   = null;
+         if (parentPathDestination == null || parentPathDestination.equals("")) {
+            pathHWFileDes = pathHw ;
+        } else {
+            pathHWFileDes = pathHw + "/" + parentPathDestination.replaceFirst(String.valueOf(userId) +"/", "");
+        }
+        File fileSource = new File(pathFileSource);
+        
+        String pathFileDes = pathHWFileDes + filename + "." + fileType;
+        File fileDes  = new File(pathFileDes);
+        
+        int numberFile = 0;
+        while(!fileDes.exists()){
+            numberFile ++;
+            pathFileDes = pathHWFileDes + filename + "("+String.valueOf(numberFile) +")" + "." + fileType;
+            fileDes = new File(pathFileDes);
+        }
+        filename = filename + "("+String.valueOf(numberFile) +")";
+        try {
+            InputStream inStream = null;
+            OutputStream outStream = null;
+            inStream = new FileInputStream(fileSource);
+            outStream = new FileOutputStream(fileDes);
+
+            byte[] buffer = new byte[1024];
+
+            int length;
+            //copy the file content in bytes
+            while ((length = inStream.read(buffer)) > 0) {
+                outStream.write(buffer, 0, length);
+            }
+            inStream.close();
+            outStream.close();
+
+            //delete the original file
+            
+            System.out.println("File is copied successful!");
+
+            if (fileDao.addNewFileFavourite(pathHw, parentPathDestination, filename, fileType, new File(pathHw + "/" + Constant.FILE_CONFIG))) {
+                return Response.status(Constant.NORMAL).build();
+            } else {
+                return Response.status(Constant.EROR).build();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return Response.status(Constant.EROR).build();
+    }
 }

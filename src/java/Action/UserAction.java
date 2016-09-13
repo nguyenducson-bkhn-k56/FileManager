@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
  *
  * @author nguyen
  */
-@Path("UserAction")
+@Path("user")
 public class UserAction {
 
     public static String root = "UserAction";
