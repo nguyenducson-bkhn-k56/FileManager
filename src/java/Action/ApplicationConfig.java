@@ -31,7 +31,6 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(Action.FavouriteAction.class);
         resources.add(Action.FileAction.class);
-        resources.add(Action.FileActionB.class);
         resources.add(Action.FolderAction.class);
         resources.add(Action.UserAction.class);
         resources.add(test.Test.class);

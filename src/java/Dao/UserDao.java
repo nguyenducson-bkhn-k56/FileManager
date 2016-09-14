@@ -49,29 +49,58 @@ public class UserDao {
             userEntity.setUserCode("ducson");
             userEntity.setPassWord("hoalan93");
             userEntity.setUserId(123456);
+            userEntity.setRole(false);
             lstUser.add(userEntity);
 
             userEntity = new UserEntity();
             userEntity.setUserName("bachBui");
             userEntity.setUserCode("bachBui");
-            userEntity.setPassWord("123456");
+            userEntity.setPassWord("1");
             userEntity.setUserId(123454);
+            userEntity.setRole(false);
             lstUser.add(userEntity);
 
             userEntity = new UserEntity();
             userEntity.setUserName("sonDang");
             userEntity.setUserCode("sonDang");
-            userEntity.setPassWord("123456");
+            userEntity.setPassWord("1");
             userEntity.setUserId(123453);
+            userEntity.setRole(false);
             lstUser.add(userEntity);
 
             userEntity = new UserEntity();
             userEntity.setUserName("binhMac");
             userEntity.setUserCode("binhMac");
-            userEntity.setPassWord("123456");
+            userEntity.setPassWord("1");
             userEntity.setUserId(123452);
+            userEntity.setRole(false);
+            lstUser.add(userEntity);
+            
+            
+            userEntity = new UserEntity();
+            userEntity.setUserName("admin");
+            userEntity.setUserCode("admin");
+            userEntity.setPassWord("1");
+            userEntity.setUserId(989089);
+            userEntity.setRole(true);
             lstUser.add(userEntity);
 
+            userEntity = new UserEntity();
+            userEntity.setUserName("admin2");
+            userEntity.setUserCode("admin2");
+            userEntity.setPassWord("1");
+            userEntity.setUserId(452345);
+            userEntity.setRole(true);
+            lstUser.add(userEntity);
+            
+            userEntity = new UserEntity();
+            userEntity.setUserName("user");
+            userEntity.setUserCode("user");
+            userEntity.setPassWord("1");
+            userEntity.setUserId(198749);
+            userEntity.setRole(true);
+            lstUser.add(userEntity);
+            
             ListUser listUser = new ListUser();
             listUser.setListUser(lstUser);
             File fileUser = new File(Constant.Constant.FOLDER_PATH_HW +"/" + Constant.Constant.ROOT_FOLDER_FAVOURITE_NAME + "/" + "fileUser.txt");

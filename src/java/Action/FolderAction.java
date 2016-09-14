@@ -66,6 +66,7 @@ public class FolderAction {
     public Response addFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
 
         try {
+            
             name = name.trim();
             FileDao dao = new FileDao();
             File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);

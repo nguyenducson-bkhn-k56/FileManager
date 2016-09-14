@@ -151,12 +151,13 @@ public class FileAction {
     @POST
     @Path("/editFileName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer editFileName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
+    public Integer editFileName(@FormParam(Constant.Param.PARENTPATH) String parentPath,
+        @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName, @FormParam(Constant.Param.FILETYPE) String fileType) {
         name = name.trim();
         newName = newName.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
         FileDao dao = new FileDao();
-        if (dao.editFileName(parentPath, name, newName, fileConfig)) {
+        if (dao.editFileName(parentPath, name, newName,fileType, fileConfig)) {
             return Constant.NORMAL;
         }
         return Constant.EROR;

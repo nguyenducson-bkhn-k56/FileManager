@@ -86,11 +86,10 @@ public class FileDao {
 
     
 
-    public boolean editFileName(String parentPath, String oldName, String newName, File fileConfig) {
+    public boolean editFileName(String parentPath, String oldName, String newName, String fileType, File fileConfig) {
         try {
 
             String arrayFile[] = parentPath.replace("/", "-").split("-");
-            FolderContent tempFolderContent;
             FolderContent destinyFolderContent = null;
             FolderContent rootFolder;
             boolean isFound = false; //
@@ -123,7 +122,7 @@ public class FileDao {
                 return false;
             }
             for (FileContent fileTemp : listFileTemp) {
-                if (fileTemp.getName().equals(oldName)) {
+                if (fileTemp.getName().equals(oldName)&&fileTemp.getFileType().equals(fileType)) {
                     fileNeedEdit = fileTemp;
                     break;
                 }
@@ -132,8 +131,8 @@ public class FileDao {
                 return false;
             }
 
-            String pathOldFile = Constant.FOLDER_PATH_HW + "/" + fileNeedEdit.getParentPath().replace("root/", "").replace("/root", "").replace("root", "") + "/" + fileNeedEdit.getName() + "." + fileNeedEdit.getFileType();
-            String pathNewFile = Constant.FOLDER_PATH_HW + "/" + fileNeedEdit.getParentPath().replace("root/", "").replace("/root", "").replace("root", "") + "/" + newName + "." + fileNeedEdit.getFileType();
+            String pathOldFile = Constant.FOLDER_PATH_HW + "/" + fileNeedEdit.getParentPath().replace("root/", "").replace("/root", "").replace("root", "") + "/" + fileNeedEdit.getName() + "." + fileType;
+            String pathNewFile = Constant.FOLDER_PATH_HW + "/" + fileNeedEdit.getParentPath().replace("root/", "").replace("/root", "").replace("root", "") + "/" + newName + "." + fileType;
             File fileOld = new File(pathOldFile);
             File fileNew = new File(pathNewFile);
             if (fileOld.exists()) {

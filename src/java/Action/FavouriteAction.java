@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
@@ -104,7 +105,7 @@ public class FavouriteAction {
             ex.printStackTrace();
             return Response.status(Constant.EROR).build();
         }
-
+        
     }
 
     /**

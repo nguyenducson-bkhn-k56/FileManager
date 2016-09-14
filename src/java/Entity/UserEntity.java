@@ -16,6 +16,15 @@ public class UserEntity {
     private String passWord;
     private String parentPath;
     private String folderName;
+    private boolean role;
+
+    public boolean getRole() {
+        return  role;
+    }
+
+    public void setRole(boolean role) {
+        this.role = role;
+    }
 
     public String getPassWord() {
         return passWord;
