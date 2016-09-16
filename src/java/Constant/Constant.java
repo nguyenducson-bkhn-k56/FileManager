@@ -42,6 +42,8 @@ public class Constant {
         public static final String PARENTPATH = "parentPath";
         public static final String ABSOLUTEPATH = "absolutePath";
         public static final String NEWNAME = "newName";
+        public static final String PARENTPATH_SOURCE_FILE = "parentPathSourceFile";
+        public static final String PARENTPATH_DESTINY_FILE = "parentPathDestinyFile";
     }
     
     public final class TreeFavourite{

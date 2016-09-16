@@ -90,16 +90,15 @@ public class FolderAction {
     @POST
     @Path("/editFolderName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer editFolderName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
+    public Response editFolderName(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName) {
         name = name.trim();
         newName = newName.trim();
         FileDao dao = new FileDao();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
         if (dao.editFolder(parentPath, name, newName, fileConfig)) {
-            return Constant.NORMAL;
+            return Response.status(Constant.NORMAL).build();
         }
-        return Constant.EROR;
-
+        return Response.status(Constant.EROR).build();
     }
 
     /**
@@ -113,14 +112,14 @@ public class FolderAction {
     @POST
     @Path("/deleteFolder")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer delFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
+    public Response delFolder(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
         name = name.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
         if (dao.delFolder(parentPath, name,fileConfig)) {
-            return Constant.NORMAL;
+            return Response.status(Constant.NORMAL).build();
         }
-        return Constant.EROR;
+        return Response.status(Constant.EROR).build();
     }
 
 }

@@ -72,6 +72,11 @@ public class FileAction {
 
         String newFilePath = Constant.FOLDER_PATH_HW + "/" + parentPath.replace("root/", "").replace("/root", "").replace("root", "") + "/" + fileName + "." + fileType;
         File newFile = new File(newFilePath);
+        if(newFile.exists())
+        {
+            fileTemp.deleteOnExit();
+            return Response.status(Constant.EROR_FOLDER_FILE_EXIST).build();
+        }
         try {
             InputStream inStream = null;
             OutputStream outStream = null;
@@ -151,30 +156,38 @@ public class FileAction {
     @POST
     @Path("/editFileName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer editFileName(@FormParam(Constant.Param.PARENTPATH) String parentPath,
-        @FormParam(Constant.Param.NAME) String name, @FormParam(Constant.Param.NEWNAME) String newName, @FormParam(Constant.Param.FILETYPE) String fileType) {
-        name = name.trim();
+    public Response editFileName(@FormParam(Constant.Param.PARENTPATH) String parentPath,
+        @FormParam(Constant.Param.FILENAME) String fileName, @FormParam(Constant.Param.NEWNAME) String newName, @FormParam(Constant.Param.FILETYPE) String fileType) {
+        fileName = fileName.trim();
         newName = newName.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
         FileDao dao = new FileDao();
-        if (dao.editFileName(parentPath, name, newName,fileType, fileConfig)) {
-            return Constant.NORMAL;
+        if (dao.editFileName(parentPath, fileName, newName,fileType, fileConfig)) {
+            return Response.status(Constant.NORMAL).build();
         }
-        return Constant.EROR;
+        return  Response.status(Constant.EROR).build();
 
     }
 
     @POST
     @Path("/delFile")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Integer removeFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
+    public Response removeFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
         FileDao dao = new FileDao();
         name = name.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
 
         if (dao.delFile(parentPath, name,fileConfig)) {
-            return Constant.NORMAL;
+            return Response.status(Constant.NORMAL).build();
         }
-        return Constant.EROR;
+        return Response.status(Constant.EROR).build();
+    }
+    
+    
+    
+    @POST
+    @Path("moveFile")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void moveFile(@PathParam(Constant.Param.FILENAME) String fileName){
     }
 }
