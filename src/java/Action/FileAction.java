@@ -172,12 +172,12 @@ public class FileAction {
     @POST
     @Path("/delFile")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response removeFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.NAME) String name) {
+    public Response removeFile(@FormParam(Constant.Param.PARENTPATH) String parentPath, @FormParam(Constant.Param.FILENAME) String fileName,@FormParam(Constant.Param.FILETYPE) String fileType) {
         FileDao dao = new FileDao();
-        name = name.trim();
+        fileName = fileName.trim();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
 
-        if (dao.delFile(parentPath, name,fileConfig)) {
+        if (dao.delFile(parentPath, fileName,fileType,fileConfig)) {
             return Response.status(Constant.NORMAL).build();
         }
         return Response.status(Constant.EROR).build();
@@ -186,8 +186,21 @@ public class FileAction {
     
     
     @POST
-    @Path("moveFile")
+    @Path("/moveFile")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void moveFile(@PathParam(Constant.Param.FILENAME) String fileName){
+    public Response moveFile(@FormParam(Constant.Param.PARENTPATH_SOURCE_FILE) String parentPathSrcFile,
+            @FormParam(Constant.Param.PARENTPATH_DESTINY_FILE) String parentPathDesFile,
+            @FormParam(Constant.Param.FILENAME) String fileName,
+            @FormParam(Constant.Param.FILETYPE) String fileType){
+        try{
+            String pathFileConfig = Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME +"/"+Constant.FILE_CONFIG;
+            File fileConfig = new File(pathFileConfig);
+            FileDao fileDao = new FileDao();
+            int status = fileDao.moveFile(parentPathSrcFile, parentPathDesFile, fileName, fileType, fileConfig);
+            return Response.status(status).build();
+        }catch(Exception ex)
+        {
+            return Response.status(Constant.EROR).build();
+        }
     }
 }

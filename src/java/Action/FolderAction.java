@@ -95,7 +95,7 @@ public class FolderAction {
         newName = newName.trim();
         FileDao dao = new FileDao();
         File fileConfig = new File(Constant.FOLDER_PATH_HW + "/" + Constant.ROOT_FOLDER_NAME + "/" + Constant.FILE_CONFIG);
-        if (dao.editFolder(parentPath, name, newName, fileConfig)) {
+        if (dao.editFoldername(parentPath, name, newName, fileConfig)) {
             return Response.status(Constant.NORMAL).build();
         }
         return Response.status(Constant.EROR).build();
